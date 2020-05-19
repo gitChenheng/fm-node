@@ -7,12 +7,13 @@ const model=require('../model');
 const koaRequest = require('koa2-request');
 const admin=require('../services/admin');
 const db = require('../db');
+const Sequelize = require('sequelize');
 
 let uploadFile=async (ctx,next)=>{
     const fileName=ctx.request.body.name||util.generateId(6,16);
     const file = ctx.request.files.file;
-    if(file.size>1000000){
-        ctx.rest(JSONResult.err('上传文件过大，请不要超过1M'));
+    if(file.size>2000000){
+        ctx.rest(JSONResult.err('上传文件过大，请不要超过2M'));
         return;
     };
     // 创建可读流
@@ -89,20 +90,33 @@ let login=async (ctx,next)=>{
             };
             delete body.code;
             delete body.nickName;
-            let user=await User.findOrCreate({
+            let user=await User.findOne({
                 where:{isDeleted:false,openid:JSON.parse(res.body).openid},
-                defaults:prs
-            });
-            if(user){
-                let userInfo={
-                    uid:user[0].id,
-                    timestamp:Date.now(),
-                };
-                const token=jwt.sign(userInfo);
-                await redis.set(token,JSON.stringify(userInfo));
-                await redis.expire(token,30*24*60*60);
-                await ctx.rest(JSONResult.ok({token:token},'登录成功'))
+            })
+            if(!user){
+                if(body.shareId){
+                    prs.shareid=body.shareId;
+                    user=await User.create(prs);
+                    await User.update(
+                        {credit:Sequelize.literal('`credit`+100')},
+                        {where:{isDeleted:false,id:body.shareId}},
+                    );
+                }else{
+                    user=await User.create(prs);
+                }
             }
+            let userInfo={
+                uid:user.id,
+                timestamp:Date.now(),
+            };
+            const token=jwt.sign(userInfo);
+            await redis.set(token,JSON.stringify(userInfo));
+            await redis.expire(token,30*24*60*60);
+            await ctx.rest(JSONResult.ok({token:token},'登录成功'))
+            // let user=await User.findOrCreate({
+            //     where:{isDeleted:false,openid:JSON.parse(res.body).openid},
+            //     defaults:prs
+            // });
         }else{
             ctx.rest(JSONResult.err('js_code2session failed'))
         }

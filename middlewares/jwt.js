@@ -6,10 +6,10 @@ const whiteList=[
     '/api/login',
     '/api/register',
     '/api/logout',
-  '/api/findInfoConditional',
-  '/api/findInfo',
-  '/api/admin/getAllListOfAward',
-  '/api/findComment'
+    '/api/findInfoConditional',
+    '/api/findInfo',
+    '/api/admin/getAllListOfAward',
+    '/api/findComment'
 ];
 
 module.exports={
@@ -18,10 +18,8 @@ module.exports={
     },
     verify:function () {
         return async (ctx,next)=>{
-          console.log(1);
             let request_url=ctx.request.url;
             if(whiteList.includes(request_url)){
-              console.log(2)
                 await next();
             }else{
                 let token=ctx.request.header['token'];
@@ -33,14 +31,11 @@ module.exports={
                         if(err){
                             ctx.response.body=JSONResult.authority()
                         }else{
-                            //console.log(decoded);
                             await next()
                         }
                     });
                 }
             }
-
-
         }
     }
 };
