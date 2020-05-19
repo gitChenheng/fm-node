@@ -46,6 +46,7 @@ bin
 
 # node.js
 node_modules/
+public/uploads/
 npm-debug.log
 
 # BUCK
