@@ -2,7 +2,7 @@ const redis=require('../redis/redis');
 const model=require('../model');
 
 const jwt=require('jsonwebtoken');
-const JSONResult=require('../utils/JSONResult');
+const JSONResult=require('../middlewares/JSONResult');
 const jwt_secret='1eaf3h45467gvf_sf23';
 
 module.exports={

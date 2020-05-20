@@ -1,5 +1,5 @@
 const jwt=require('jsonwebtoken');
-const JSONResult=require('../utils/JSONResult');
+const JSONResult=require('./JSONResult');
 const redis=require('../redis/redis');
 const jwt_secret='1eaf3h45467gvf_sf23';
 const whiteList=[

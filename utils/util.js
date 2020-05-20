@@ -1,18 +1,12 @@
 module.exports={
-    generateId:(length,radix)=>{
-        return Number(Math.random().toString().substr(2,length||0) + Date.now()).toString(radix||36);
+    initGlobalEvents:()=>{
+        global.JSONResult=require('../middlewares/JSONResult');
+        global.APIError=require('../middlewares/rest').APIError;
     },
     initAlias:()=>{
         require('node-require-alias').setAlias({
             "@": require("path").join(__dirname, "/")
         });
-    },
-    initGlobalEvents:()=>{
-        global.JSONResult=require('./JSONResult');
-        global.APIError=require('../middlewares/rest').APIError;
-    },
-    checkPhone:(phone)=>{
-        return /^1[3456789]\d{9}$/.test(phone)
     },
     utf16toEntities:function(str) {
         var patt=/[\ud800-\udbff][\udc00-\udfff]/g; // 检测utf16字符正则
@@ -43,6 +37,12 @@ module.exports={
             }
         });
         return result;
+    },
+    generateId:(length,radix)=>{
+        return Number(Math.random().toString().substr(2,length||0) + Date.now()).toString(radix||36);
+    },
+    checkPhone:(phone)=>{
+        return /^1[3456789]\d{9}$/.test(phone)
     },
     decodeDate:function (date,hms) {
         if(hms){

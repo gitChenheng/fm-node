@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const config=require('./config/config-default');
+const config=require('./config/config').mysql;
 const util=require('./utils/util');
 
 var sequelize = new Sequelize(config.database, config.username, config.password , {
@@ -73,7 +73,6 @@ sequelize.defineModel=function (name, attributes,options) {
                 if(!obj.deletedAt)obj.deletedAt = new Date('9999');
                 if(!obj.version)obj.version = 0;
                 if(!obj.isDeleted)obj.isDeleted = 0;
-
 
                 // if (obj.isNewRecord) {
                 //     if (!obj.id&&options&&options.idFlag) obj.id = util.generateId(5);

@@ -1,6 +1,8 @@
 /**
- * by ch
+ * by Chase陈
  */
+const config=require('./config/config').node;
+const {ENV_PROD}=require('./constans');
 const fs = require('fs');
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
@@ -13,10 +15,12 @@ const rest=require('./middlewares/rest');
 const koaBody = require('koa-body');
 const staticFiles = require('koa-static');
 const util=require('./utils/util');
-const https = require('https');
-const enforceHttps = require('koa-sslify').default;
-app.use(enforceHttps());
-
+let https;
+if(process.env.NODE_ENV===ENV_PROD){
+    https = require('https');
+    const enforceHttps = require('koa-sslify').default;
+    app.use(enforceHttps());
+}
 util.initAlias();
 util.initGlobalEvents();
 app.use(staticFiles(path.resolve(__dirname, "./public")));//静态目录
@@ -29,17 +33,20 @@ app.use(koaBody({
 app.use(bodyParser());
 app.use(rest.restIfy());
 app.use(controller());
-
-
-// const server = https.createServer(app.callback());
-// server.listen(3000);
-
-const options = {
-  key: fs.readFileSync('./https/2_www.denominator.online.key'),
-  cert: fs.readFileSync('./https/1_www.denominator.online_bundle.crt')
-};
-const httpsServer = https.createServer(options, app.callback());
-httpsServer.listen(3000);
+if(process.env.NODE_ENV===ENV_PROD){
+    const options = {
+        key: fs.readFileSync('./https/2_www.denominator.online.key'),
+        cert: fs.readFileSync('./https/1_www.denominator.online_bundle.crt')
+    };
+    const httpsServer = https.createServer(options, app.callback());
+    httpsServer.listen(config.port,()=>{
+        console.log(`start at port ${config.port}`)
+    });
+}else{
+    app.listen(config.port,()=>{
+        console.log(`start at port ${config.port}`)
+    })
+}
 
 
 
