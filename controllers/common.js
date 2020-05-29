@@ -4,10 +4,8 @@ const util=require('../utils/util');
 const jwt=require('../middlewares/jwt');
 const redis=require('../redis/redis');
 const model=require('../model');
-const koaRequest = require('koa2-request');
-const admin=require('../services/admin');
-const db = require('../db');
 const Sequelize = require('sequelize');
+const {js_code2_session} =require('../services/wx');
 
 let uploadFile=async (ctx,next)=>{
     const fileName=ctx.request.body.name||util.generateId(6,16);
@@ -67,20 +65,13 @@ let login=async (ctx,next)=>{
             ctx.rest(JSONResult.err('缺省code'));
             return;
         }
-        let res=await koaRequest({
-            url: `https://api.weixin.qq.com/sns/jscode2session`,
-            method: 'GET',
-            qs: {
-                appid: 'wx43c3b5e1b112b5b0',
-                secret: '054863f7132604d2c147d57b6b3158ae',
-                js_code:body.code,
-                grant_type:'authorization_code',
-            }
-        });
-        if(res.body){
+        const jscode2session=await js_code2_session(body.code);
+        if(jscode2session.errcode){
+            ctx.rest(JSONResult.err(jscode2session.errmsg))
+        }else{
             let User=model.User;
             let prs={
-                openid:JSON.parse(res.body).openid,
+                openid:JSON.parse(jscode2session).openid,
                 ...body,
                 name:util.utf16toEntities(body.nickName),
                 // address:'',
@@ -91,7 +82,7 @@ let login=async (ctx,next)=>{
             delete body.code;
             delete body.nickName;
             let user=await User.findOne({
-                where:{isDeleted:false,openid:JSON.parse(res.body).openid},
+                where:{isDeleted:false,openid:JSON.parse(jscode2session).openid},
             })
             if(!user){
                 if(body.shareId){
@@ -114,11 +105,9 @@ let login=async (ctx,next)=>{
             await redis.expire(token,30*24*60*60);
             await ctx.rest(JSONResult.ok({token:token},'登录成功'))
             // let user=await User.findOrCreate({
-            //     where:{isDeleted:false,openid:JSON.parse(res.body).openid},
+            //     where:{isDeleted:false,openid:JSON.parse(jscode2session).openid},
             //     defaults:prs
             // });
-        }else{
-            ctx.rest(JSONResult.err('js_code2session failed'))
         }
     }catch (e) {
         throw new APIError('',e)

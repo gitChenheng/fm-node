@@ -1,4 +1,6 @@
 module.exports={
+    APP_ID:'wx43c3b5e1b112b5b0',
+    APP_SECRET:'12323ffbc36e112c5ea847fc76bb5d54',
     ENV_PROD:'production',
     ENV_DEV:'development',
     ACHIEVE:{

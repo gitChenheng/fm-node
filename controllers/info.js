@@ -2,6 +2,7 @@ const model=require('../model');
 const admin=require('../services/admin');
 const util=require('../utils/util');
 const Sequelize = require('sequelize');
+const {get_access_token,msg_sec_check} =require('../services/wx');
 
 let addInfo=async (ctx,next)=>{
     let body=ctx.request.body;
@@ -12,33 +13,44 @@ let addInfo=async (ctx,next)=>{
         return;
     }
     try {
-        let vo=JSON.parse(JSON.stringify(body));
-        vo.startTime=new Date(vo.startTime);
-        vo.endTime=new Date(vo.endTime);
-        vo.reviewStatus=0;
-        vo.authorId=authorId;
-        let User=model.User;
-        let user=await User.findOne({
-            where:{isDeleted:false,id:authorId}
-        });
-        vo.author=user.name;
-        // console.log('name===',util.uncodeUtf16(user.name))
+        const at=await get_access_token();
+        if(at.errcode){
+            ctx.rest(JSONResult.err(at.errmsg))
+        }else{
+            const access_token=at.access_token;
+            const msg_sec_res=await msg_sec_check(access_token,JSON.stringify(body));
+            if(msg_sec_res.errcode){
+                ctx.rest(JSONResult.err(msg_sec_res.errmsg))
+            }else{
+                let vo=JSON.parse(JSON.stringify(body));
+                vo.startTime=new Date(vo.startTime);
+                vo.endTime=new Date(vo.endTime);
+                vo.reviewStatus=0;
+                vo.authorId=authorId;
+                let User=model.User;
+                let user=await User.findOne({
+                    where:{isDeleted:false,id:authorId}
+                });
+                vo.author=user.name;
+                // console.log('name===',util.uncodeUtf16(user.name))
 
-        let Platform=model.Platform;
-        let platform=await Platform.findOne({
-            where:{isDeleted:false,id:vo.platformId}
-        });
-        vo.platformImgUrl=platform.platformImgUrl;
-        vo.platform=platform.name;
-        let Type=model.Type;
-        let type=await Type.findOne({
-            where:{isDeleted:false,id:vo.typeId}
-        });
-        vo.type=type.name;
+                let Platform=model.Platform;
+                let platform=await Platform.findOne({
+                    where:{isDeleted:false,id:vo.platformId}
+                });
+                vo.platformImgUrl=platform.platformImgUrl;
+                vo.platform=platform.name;
+                let Type=model.Type;
+                let type=await Type.findOne({
+                    where:{isDeleted:false,id:vo.typeId}
+                });
+                vo.type=type.name;
 
-        let info=await Info.create(vo);
-        if(info)
-            ctx.rest(JSONResult.ok());
+                let info=await Info.create(vo);
+                if(info)
+                    ctx.rest(JSONResult.ok());
+            }
+        }
     }catch (e) {
         throw new APIError('',e)
     }

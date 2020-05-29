@@ -116,32 +116,33 @@ let delUser=async (ctx,next)=>{
 let findUser=async (ctx,next)=>{
     let body=ctx.request.body;
     let User=model.User;
-    if(!body.name&&!body.phone){
-        let user=await User.findAll({
-            where:{isDeleted:false}
+    // if(body.phone&&!util.checkPhone(body.phone)){
+    //     ctx.rest(JSONResult.err('手机号码格式错误'));
+    //     return;
+    // }
+    if(!body.personalId){
+        ctx.rest(JSONResult.err('缺省参数personalId'));
+        return ;
+    }
+    try {
+        console.log(body.personalId)
+        let user=await User.findOne({
+            where:{isDeleted:false,id:body.personalId}
         });
-        ctx.rest(JSONResult.ok(user));
-    }else{
-        if(body.phone&&!util.checkPhone(body.phone)){
-            ctx.rest(JSONResult.err('手机号码格式错误'));
-            return;
+        if(user){
+            let vo=JSON.parse(JSON.stringify(user));
+            vo.name=util.uncodeUtf16(vo.name);
+            delete vo.openid;
+            delete vo.createdAt;
+            delete vo.updatedAt;
+            delete vo.version;
+            delete vo.pwd;
+            ctx.rest(JSONResult.ok(vo));
+        }else{
+            ctx.rest(JSONResult.err('查无此人！'));
         }
-        try {
-            let user=await User.findOne({
-                where:{
-                    name:body.name,
-                    // $or:[
-                    //     {phone:{$like:body.phone}}
-                    //     // {id:[1,2,3]},
-                    //     // {id:{$gt:10}},
-                    // ]
-                }
-            });
-            if(user)
-                ctx.rest(JSONResult.ok(user));
-        }catch (e) {
-            throw new APIError('',e)
-        }
+    }catch (e) {
+        throw new APIError('',e)
     }
 };
 
