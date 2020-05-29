@@ -67,6 +67,18 @@ module.exports = db.defineModel('users', {
         type: Sequelize.DATE,
         allowNull: true
     },
+    continueSign:{
+        type: Sequelize.INTEGER,
+        allowNull: true,
+    },
+    achieve:{
+        type: Sequelize.TEXT,
+        allowNull: true
+    },
+    authority:{
+        type: Sequelize.INTEGER,
+        allowNull: true,
+    },
     address:{
         type:Sequelize.TEXT,
         allowNull: true

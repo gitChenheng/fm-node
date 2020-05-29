@@ -2,6 +2,7 @@ const model=require('../model');
 const util=require('../utils/util');
 const redis=require('../redis/redis');
 const admin=require('../services/admin');
+const Sequelize = require('sequelize');
 
 let addUser=async (ctx,next)=>{
     let body=ctx.request.body;
@@ -48,6 +49,41 @@ let updateUser=async (ctx,next)=>{
         );
         if(user)
             ctx.rest(JSONResult.ok(user,'修改成功'));
+    }catch (e) {
+        throw new APIError('',e)
+    }
+};
+
+let updateCredit=async (ctx,next)=>{
+    let body=ctx.request.body;
+    let User=model.User;
+    try {
+        let uid=await admin.getUid(ctx,next);
+        let user=await User.findOne({
+            where:{id:uid, isDeleted:false,}
+        });
+        if(!body.credit){
+            ctx.rest(JSONResult.err('缺少credit参数'));
+            return ;
+        }
+        if(user){
+            const c=body.credit;
+            let credit='';
+            if(c>=0){
+                credit=`+${String(c)}`;
+            }else{
+                credit=String(c);
+            }
+            await User.update(
+                {credit:Sequelize.literal('`credit`'+credit)},
+                {where:{isDeleted:false,id:uid}},
+            )
+            let res=await User.findOne({
+                where:{id:uid, isDeleted:false,}
+            });
+            ctx.rest(JSONResult.ok(res,''));
+        }
+
     }catch (e) {
         throw new APIError('',e)
     }
@@ -143,25 +179,39 @@ let getUserInfo=async (ctx,next)=>{
 
 let getRangesByCredit=async (ctx,next)=>{
     try {
+        let uid=await admin.getUid(ctx,next);
         let User=model.User;
         let user=await User.findAll({
             where:{isDeleted:false},
             order:[
                 ['credit','DESC']
             ],
-            limit:10
+            limit:100
         });
         if(user){
             let vo=JSON.parse(JSON.stringify(user));
-            let res=[];
-            vo.forEach(it=>{
-                res.push({
+            let res={
+                myPosi:null,
+                creditRange:[]
+            };
+            for (let k=0;k<vo.length;k++){
+                if(vo[k].id===uid){
+                    res.myPosi=k+1;
+                    break;
+                }
+            }
+            for (let k=0;k<vo.length;k++){
+                const it=vo[k];
+                if(k>9){
+                    break;
+                }
+                res.creditRange.push({
                     id:it.id,
                     name:util.uncodeUtf16(it.name),
                     avatarUrl:it.avatarUrl,
                     credit:it.credit
                 })
-            });
+            }
             ctx.rest(JSONResult.ok(res));
         }
     }catch (e) {
@@ -176,4 +226,5 @@ module.exports = {
     'POST /api/findUser': findUser,
     'POST /api/getUserInfo': getUserInfo,
     'POST /api/getRangesByCredit': getRangesByCredit,
+    'POST /api/updateCredit': updateCredit,
 };

@@ -3,14 +3,11 @@ const util=require('../utils/util');
 const redis=require('../redis/redis');
 const Sequelize = require('sequelize');
 const admin=require('../services/admin');
-
+const {ACHIEVE}=require('../constans');
 let addSign=async (ctx,next)=>{
     let Sign=model.Sign;
     let User=model.User;
     try {
-        // let token=ctx.request.header['token'];
-        // let redisResult=await redis.get(token);
-        // let uid=JSON.parse(redisResult).uid;
         let uid=await admin.getUid(ctx,next);
         let user=await User.findOne({
             where:{isDeleted:false,id:uid}
@@ -23,15 +20,71 @@ let addSign=async (ctx,next)=>{
             let now=Date.now();
             if(searchSign.length){//签到过
                 let todayEarlyMorning=new Date(new Date().setHours(0, 0, 0, 0)).getTime();//今日凌晨时间戳
-                if(searchSign[0].createdAt<todayEarlyMorning){//最近一次签到不是今天，创建
-                    //今日未签到
+                let yesterdayEarlyMorning=todayEarlyMorning-24*60*60*1000;
+                const lastSignTime=searchSign[0].createdAt;
+                if(lastSignTime<yesterdayEarlyMorning){//最近一次签到早于昨天
                     await Sign.create({uid,name:user.name});
                     await User.update(
-                        {lastSignInTime:now,credit:Sequelize.literal('`credit`+1')},
+                        {lastSignInTime:now,continueSign:1,credit:Sequelize.literal('`credit`+1')},
                         {where:{id:uid}}
                     );
-                    ctx.rest(JSONResult.ok(null,'签到成功'));
-                }else{//最近一次签到是今天，更新
+                    ctx.rest(JSONResult.ok(null,`签到成功，积分+1`));
+                }else if(lastSignTime>=yesterdayEarlyMorning&&lastSignTime<todayEarlyMorning){//昨天签到
+                    await Sign.create({uid,name:user.name});
+                    const largest=10;
+                    let cs=user.continueSign,credit;
+                    if(cs>=largest-1) {
+                        credit=String(Number(largest));
+                    }else{
+                        credit=String(Number(cs)+1);
+                    }
+                    await User.update(
+                        {
+                            lastSignInTime:now,
+                            continueSign:Sequelize.literal('`continueSign`+1'),
+                            credit:Sequelize.literal('`credit`+'+credit)
+                        },
+                        {where:{id:uid}}
+                    );
+                    let achLevel=null,toastContent='';
+                    switch (cs) {
+                        case 7-1:
+                            achLevel=ACHIEVE.SIGN_EASY;
+                            toastContent=`恭喜解锁成就：${ACHIEVE.SIGN_EASY_LABEL}`
+                            break;
+                        case 30-1:
+                            achLevel=ACHIEVE.SIGN_NORMAL;
+                            toastContent=`恭喜解锁成就：${ACHIEVE.SIGN_NORMAL_LABEL}`
+                            break;
+                        case 180-1:
+                            achLevel=ACHIEVE.SIGN_HARD;
+                            toastContent=`恭喜解锁成就：${ACHIEVE.SIGN_HARD_LABEL}`
+                            break;
+                        case 365-1:
+                            achLevel=ACHIEVE.SIGN_GOD;
+                            toastContent=`恭喜解锁成就：${ACHIEVE.SIGN_GOD_LABEL}`
+                            break;
+                    }
+                    if(achLevel){
+                        let achieveArr;
+                        if(!user.achieve){
+                            achieveArr=[];
+                        }else{
+                            achieveArr=user.achieve.split(',');
+                        }
+                        if(!achieveArr.includes(achLevel)){
+                            achieveArr.push(achLevel);
+                            let achieve=achieveArr.join(',');
+                            await User.update(
+                                {achieve},
+                                {where:{id:uid}}
+                            );
+                            ctx.rest(JSONResult.ok(null,`连续签到成功，积分+${credit}；${toastContent}`));
+                        }
+                    }else{
+                        ctx.rest(JSONResult.ok(null,`连续签到成功，积分+${credit}`));
+                    }
+                }else{
                     //今日已签到
                     let updateSign=await Sign.update(
                         {updatedAt:now},
@@ -48,7 +101,7 @@ let addSign=async (ctx,next)=>{
                 //今日未签到
                 await Sign.create({uid,name:user.name});
                 await User.update(
-                    {lastSignInTime:now,credit:Sequelize.literal('`credit`+10')},
+                    {lastSignInTime:now,continueSign:1,credit:Sequelize.literal('`credit`+10')},
                     {where:{id:uid}}
                 );
                 ctx.rest(JSONResult.ok(null,'签到成功'));

@@ -1,4 +1,14 @@
 module.exports={
     ENV_PROD:'production',
     ENV_DEV:'development',
+    ACHIEVE:{
+        SIGN_EASY:'1',
+        SIGN_EASY_LABEL:'签到新人',
+        SIGN_NORMAL:'2',
+        SIGN_NORMAL_LABEL:'签到达人',
+        SIGN_HARD:'3',
+        SIGN_HARD_LABEL:'签到狂人',
+        SIGN_GOD:'4',
+        SIGN_GOD_LABEL:'签到狂魔',
+    }
 }
