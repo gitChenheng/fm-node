@@ -3,6 +3,7 @@ module.exports={
     APP_SECRET:'12323ffbc36e112c5ea847fc76bb5d54',
     ENV_PROD:'production',
     ENV_DEV:'development',
+    ACCESS_TOKEN:'ACCESS_TOKEN',
     ACHIEVE:{
         SIGN_EASY:'1',
         SIGN_EASY_LABEL:'签到新人',
@@ -12,5 +13,8 @@ module.exports={
         SIGN_HARD_LABEL:'签到狂人',
         SIGN_GOD:'4',
         SIGN_GOD_LABEL:'签到狂魔',
+    },
+    toast:{
+        RISKY_HINT:'检测到违规内容，请修改后重试',
     }
 }

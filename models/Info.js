@@ -82,6 +82,14 @@ module.exports = db.defineModel('infos', {
         type: Sequelize.TEXT,
         allowNull: true
     },
+    link:{
+        type: Sequelize.TEXT,
+        allowNull: true
+    },
+    imgs:{
+        type: Sequelize.STRING(300),
+        allowNull: true
+    },
     details:{
         type: Sequelize.TEXT,
         allowNull: true

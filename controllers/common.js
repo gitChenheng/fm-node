@@ -10,8 +10,8 @@ const {js_code2_session} =require('../services/wx');
 let uploadFile=async (ctx,next)=>{
     const fileName=ctx.request.body.name||util.generateId(6,16);
     const file = ctx.request.files.file;
-    if(file.size>2000000){
-        ctx.rest(JSONResult.err('上传文件过大，请不要超过2M'));
+    if(file.size>1000000){
+        ctx.rest(JSONResult.err('上传文件过大，请不要超过1M'));
         return;
     };
     // 创建可读流
@@ -45,17 +45,6 @@ let uploadFile=async (ctx,next)=>{
         reader.pipe(upStream);
     }
      **/
-};
-
-let test_cors=async (ctx,next)=>{
-    // const body=ctx.request.body;
-    let token=ctx.request.header['token'];
-    let redisResult=await redis.get(token);
-    // console.log(JSON.parse(redisResult).uid);
-
-
-
-    ctx.rest(JSONResult.ok())
 };
 
 let login=async (ctx,next)=>{
@@ -154,7 +143,6 @@ let getAllListOfAward=async (ctx,next)=>{
 module.exports = {
   uploadFile,
     'POST /api/uploadFile': uploadFile,
-    'POST /api/test_cors': test_cors,
     'POST /api/login': login,
     'POST /api/admin/getAllListOfAward': getAllListOfAward,
 };

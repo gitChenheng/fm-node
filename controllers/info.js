@@ -3,7 +3,18 @@ const admin=require('../services/admin');
 const util=require('../utils/util');
 const Sequelize = require('sequelize');
 const {get_access_token,msg_sec_check} =require('../services/wx');
+const {toast}=require('../constans');
+const common=require('./common');
 
+let uploadInfoImg=async (ctx,next)=>{
+    try {
+        let filePath=await common.uploadFile(ctx,next);
+        if(filePath)
+            ctx.rest(JSONResult.ok(filePath));
+    }catch (e) {
+        throw APIError(e);
+    }
+};
 let addInfo=async (ctx,next)=>{
     let body=ctx.request.body;
     let authorId=await admin.getUid(ctx,next);
@@ -18,8 +29,10 @@ let addInfo=async (ctx,next)=>{
             ctx.rest(JSONResult.err(at.errmsg))
         }else{
             const access_token=at.access_token;
-            const msg_sec_res=await msg_sec_check(access_token,JSON.stringify(body));
-            if(msg_sec_res.errcode){
+            let msg_sec_res=await msg_sec_check(access_token,JSON.stringify(body));
+            if(msg_sec_res.errcode===87014){
+                ctx.rest(JSONResult.err(toast.RISKY_HINT))
+            }else if(msg_sec_res.errcode){
                 ctx.rest(JSONResult.err(msg_sec_res.errmsg))
             }else{
                 let vo=JSON.parse(JSON.stringify(body));
@@ -245,6 +258,7 @@ let findInfoConditional=async (ctx,next)=>{
 };
 
 module.exports = {
+    'POST /api/uploadInfoImg': uploadInfoImg,
     'POST /api/addInfo': addInfo,
     'POST /api/updateInfo': updateInfo,
     'POST /api/delInfo': delInfo,
