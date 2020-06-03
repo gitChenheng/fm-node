@@ -56,13 +56,17 @@ let addSign=async (ctx,next)=>{
                             achLevel=ACHIEVE.SIGN_NORMAL;
                             toastContent=`恭喜解锁成就：${ACHIEVE.SIGN_NORMAL_LABEL}`
                             break;
-                        case 180-1:
+                        case 90-1:
                             achLevel=ACHIEVE.SIGN_HARD;
                             toastContent=`恭喜解锁成就：${ACHIEVE.SIGN_HARD_LABEL}`
                             break;
-                        case 365-1:
+                        case 180-1:
                             achLevel=ACHIEVE.SIGN_GOD;
                             toastContent=`恭喜解锁成就：${ACHIEVE.SIGN_GOD_LABEL}`
+                            break;
+                        case 365-1:
+                            achLevel=ACHIEVE.SIGN_FOREVER;
+                            toastContent=`恭喜解锁成就：${ACHIEVE.SIGN_FOREVER_LABEL}`
                             break;
                     }
                     if(achLevel){
