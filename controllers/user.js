@@ -183,7 +183,7 @@ let getRangesByCredit=async (ctx,next)=>{
         let uid=await admin.getUid(ctx,next);
         let User=model.User;
         let user=await User.findAll({
-            where:{isDeleted:false},
+            where:{isDeleted:false,role:0},
             order:[
                 ['credit','DESC']
             ],
