@@ -29,7 +29,7 @@ const wx={
             return JSON.parse(cache_access_token);
         }else{
             const at=await wx.at_server();
-            set(ACCESS_TOKEN,JSON.stringify(at),at.expire);
+            set(ACCESS_TOKEN,JSON.stringify(at),1200);
             return at;
         }
     },
