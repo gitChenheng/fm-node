@@ -121,11 +121,16 @@ let getAllListOfAward=async (ctx,next)=>{
         let achieve=await Achieve.findAll({
             where:{isDeleted:false}
         });
+        let Reward=model.Reward;
+        let reward=await Reward.findAll({
+            where:{isDeleted:false}
+        });
         ctx.rest(JSONResult.ok({
             typeData:type,
             platformData:platform,
             methodData:method,
             achieveData:achieve,
+            rewardData:reward,
         }))
 
         // let role=await admin.getRole(ctx,next);

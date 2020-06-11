@@ -232,6 +232,11 @@ let findInfoConditional=async (ctx,next)=>{
     if(body.platformId){
         criteria['platformId']=body.platformId
     }
+    if(body.level){
+        criteria['level']=body.level;
+    }else{
+        criteria['level']={'lte':3};
+    }
     let query={
         where:criteria,
         order:[
