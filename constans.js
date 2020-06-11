@@ -4,6 +4,7 @@ module.exports={
     ENV_PROD:'production',
     ENV_DEV:'development',
     ACCESS_TOKEN:'ACCESS_TOKEN',
+    RANGE_AVAILABLE:30,
     ACHIEVE:{
         SIGN_EASY:'1',
         SIGN_EASY_LABEL:'新人报道',

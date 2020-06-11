@@ -79,7 +79,7 @@ let delReward=async (ctx,next)=>{
 let findReward=async (ctx,next)=>{
     let Reward=model.Reward;
     let reward=await Reward.findAll({
-        where:{isDeleted:false}
+        where:{isDeleted:false,onShelf:true}
     });
     ctx.rest(JSONResult.ok(reward));
 };
@@ -88,5 +88,5 @@ module.exports = {
     'POST /api/admin/addReward': addReward,
     'POST /api/admin/updateReward': updateReward,
     'POST /api/admin/delReward': delReward,
-    'POST /api/admin/findReward': findReward,
+    'POST /api/findReward': findReward,
 };

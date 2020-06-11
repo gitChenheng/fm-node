@@ -1,8 +1,8 @@
 const model=require('../model');
 const util=require('../utils/util');
-const redis=require('../redis/redis');
 const admin=require('../services/admin');
 const Sequelize = require('sequelize');
+const {RANGE_AVAILABLE}=require('../constans');
 
 let addUser=async (ctx,next)=>{
     let body=ctx.request.body;
@@ -203,7 +203,7 @@ let getRangesByCredit=async (ctx,next)=>{
             }
             for (let k=0;k<vo.length;k++){
                 const it=vo[k];
-                if(k>9){
+                if(k>(RANGE_AVAILABLE-1)){
                     break;
                 }
                 res.creditRange.push({
