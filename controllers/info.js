@@ -159,6 +159,16 @@ let findInfo=async (ctx,next)=>{
         });
         let vo=JSON.parse(JSON.stringify(info));
         let now=Date.now();
+        const uId=await admin.getUid(ctx,next);
+        const Participate=model.Participate;
+        const participate=await Participate.findOne({
+            where:{isDeleted:false,uId,infoId:vo.id}
+        });
+        if(participate){
+            vo.participate=true;
+        }else{
+            vo.participate=false;
+        }
         vo.ifBegin=new Date(vo.startTime).getTime()<now;
         vo.ifEnd=new Date(vo.endTime).getTime()<now;
         vo.author=util.uncodeUtf16(vo.author);
@@ -171,7 +181,7 @@ let findInfo=async (ctx,next)=>{
     }
 };
 
-let approve=async (ctx,next)=>{
+const approve=async (ctx,next)=>{
     let body=ctx.request.body;
     try{
         let role=await admin.getRole(ctx,next);
@@ -214,12 +224,49 @@ let approve=async (ctx,next)=>{
         throw new APIError('',e)
     }
 };
+const reject=async (ctx,next)=>{
+    let body=ctx.request.body;
+    try{
+        let role=await admin.getRole(ctx,next);
+        if(role){
+            const Info=model.Info;
+            const info_s=await Info.findOne({
+                where:{isDeleted:false,id:body.id}
+            });
+            if(!info_s.reviewStatus){
+                ctx.rest(JSONResult.err('爆料状态错误'));
+                return ;
+            }
+            let level=info_s.level;
+            let credit=Number(level)*10;
+            let info_u=await Info.update(
+                {reviewStatus:0,credit:0,level:null},
+                {
+                    where:{isDeleted:false,id:body.id}
+                }
+            );
+            let User=model.User;
+            let user_u=await User.update(
+                {credit:Sequelize.literal('`credit`-'+credit)},
+                {where:{id:info_s.authorId}}
+            );
+            if(info_u&&user_u)
+                ctx.rest(JSONResult.ok('撤回成功'));
+        }else{
+            ctx.rest(JSONResult.err('无权限'))
+        }
+    }catch (e){
+        throw new APIError('',e)
+    }
+};
 
 let findInfoConditional=async (ctx,next)=>{
     let body=ctx.request.body;
     let Info=model.Info;
+    const now=Date.now();
     let criteria={
         isDeleted:false,reviewStatus:1,//审核状态 0默认 1通过 2驳回
+        endTime:{'gt':now},//大于gt，小于lt
     };
     if(body.search){
         criteria['name']={
@@ -248,10 +295,22 @@ let findInfoConditional=async (ctx,next)=>{
         offset=(Number(body.pageIndex)-1)*Number(body.pageSize);
         query={...query,offset, limit:body.pageSize}
     }
-    let info=await Info.findAll(query);
+    const uId=await admin.getUid(ctx,next);
+    let Participate=model.Participate;
+    let participate=await Participate.findAll({
+        where:{isDeleted:false,uId}
+    });
+    let participateVo=JSON.parse(JSON.stringify(participate));
+    const info=await Info.findAll(query);
     let vo=JSON.parse(JSON.stringify(info));
-    let now=Date.now();
     vo.forEach(it=>{
+        it.participate=false;
+        for(const o of participateVo){
+            if(it.id===o.infoId&&!o.isDeleted){
+                it.participate=true;
+                break;
+            }
+        }
         it.ifBegin=new Date(it.startTime).getTime()<now;
         it.ifEnd=new Date(it.endTime).getTime()<now;
         it.author=util.uncodeUtf16(it.author);
@@ -270,4 +329,5 @@ module.exports = {
     'POST /api/findInfo': findInfo,
     'POST /api/findInfoConditional': findInfoConditional,
     'POST /api/admin/approve': approve,
+    'POST /api/admin/reject': reject,
 };
