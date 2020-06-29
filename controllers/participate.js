@@ -1,6 +1,5 @@
 const model=require('../model');
 const admin=require('../services/admin');
-const util=require('../utils/util');
 
 const actParticipate=async (ctx,next)=>{
     const body=ctx.request.body;
@@ -14,7 +13,6 @@ const actParticipate=async (ctx,next)=>{
             ctx.rest(JSONResult.err("缺省参数ifPartici"));
             return ;
         }
-        console.log('ifPartici',body.ifPartici)
         const uId=await admin.getUid(ctx,next);
         const isExit=await Participate.findOne({
             where:{uId,infoId:body.infoId}

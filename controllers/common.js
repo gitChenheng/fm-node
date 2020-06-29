@@ -7,7 +7,7 @@ const model=require('../model');
 const Sequelize = require('sequelize');
 const {js_code2_session} =require('../services/wx');
 
-let uploadFile=async (ctx,next)=>{
+const uploadFile=async (ctx,next)=>{
     const fileName=ctx.request.body.name||util.generateId(6,16);
     const file = ctx.request.files.file;
     if(file.size>1000000){
@@ -47,7 +47,7 @@ let uploadFile=async (ctx,next)=>{
      **/
 };
 
-let login=async (ctx,next)=>{
+const login=async (ctx,next)=>{
     let body=ctx.request.body;
     try {
         if(!body.code){
@@ -103,7 +103,7 @@ let login=async (ctx,next)=>{
     }
 };
 
-let getAllListOfAward=async (ctx,next)=>{
+const getAllListOfAward=async (ctx,next)=>{
     try {
         let Type=model.Type;
         let type=await Type.findAll({
@@ -145,9 +145,17 @@ let getAllListOfAward=async (ctx,next)=>{
 
 };
 
+const getAddressList=async (ctx,next)=>{
+    const addressJSONFile=fs.readFileSync(`${process.cwd()}/utils/address.json`).toString();
+    const adrObjArr=JSON.parse(addressJSONFile);
+    ctx.rest(JSONResult.ok(adrObjArr))
+
+};
+
 module.exports = {
   uploadFile,
     'POST /api/uploadFile': uploadFile,
     'POST /api/login': login,
     'POST /api/admin/getAllListOfAward': getAllListOfAward,
+    'POST /api/getAddressList': getAddressList,
 };

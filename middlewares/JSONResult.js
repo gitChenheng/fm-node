@@ -20,9 +20,7 @@ module.exports={
     },
     build:(options)=>{
         return {
-            code:options.code,
-            data:options.data,
-            msg:options.msg,
+            ...options,
         }
     },
 };

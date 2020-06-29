@@ -1,7 +1,7 @@
 const jwt=require('jsonwebtoken');
 const JSONResult=require('./JSONResult');
 const redis=require('../redis/redis');
-const jwt_secret='1eaf3h45467gvf_sf23';
+const {JWT_SECRET}=require('../constans');
 const whiteList=[
     '/api/login',
     '/api/register',
@@ -14,7 +14,7 @@ const whiteList=[
 
 module.exports={
     sign:function (obj) {
-        return jwt.sign(obj,jwt_secret,{expiresIn:'30d'});//1h  1d
+        return jwt.sign(obj,JWT_SECRET,{expiresIn:'30d'});//1h  1d
     },
     verify:function () {
         return async (ctx,next)=>{
@@ -27,7 +27,7 @@ module.exports={
                 if(redisResult){
                     await next()
                 }else{
-                    await jwt.verify(token,jwt_secret,null,async (err, decoded)=>{//此处解密为异步
+                    await jwt.verify(token,JWT_SECRET,null,async (err, decoded)=>{//此处解密为异步
                         if(err){
                             ctx.response.body=JSONResult.authority()
                         }else{

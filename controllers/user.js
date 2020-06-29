@@ -4,7 +4,7 @@ const admin=require('../services/admin');
 const Sequelize = require('sequelize');
 const {RANGE_AVAILABLE}=require('../constans');
 
-let addUser=async (ctx,next)=>{
+const addUser=async (ctx,next)=>{
     let body=ctx.request.body;
     let User=model.User;
     if(!body.phone){
@@ -31,21 +31,22 @@ let addUser=async (ctx,next)=>{
     }
 };
 
-let updateUser=async (ctx,next)=>{
+const updateUserInfo=async (ctx,next)=>{
     let body=ctx.request.body;
     let User=model.User;
-    if(!body.phone){
-        ctx.rest(JSONResult.err('请输入手机号'));
-        return;
-    }
-    if(!util.checkPhone(body.phone)){
-        ctx.rest(JSONResult.err('手机号码格式错误'));
-        return;
-    }
+    // if(!body.phone){
+    //     ctx.rest(JSONResult.err('请输入手机号'));
+    //     return;
+    // }
+    // if(!util.checkPhone(body.phone)){
+    //     ctx.rest(JSONResult.err('手机号码格式错误'));
+    //     return;
+    // }
+    let id=await admin.getUid(ctx,next);
     try {
         let user=await User.update(
-            {name:body.name},
-            {where:{phone:body.phone}}
+            {address:body.address},
+            {where:{id}}
         );
         if(user)
             ctx.rest(JSONResult.ok(user,'修改成功'));
@@ -54,7 +55,7 @@ let updateUser=async (ctx,next)=>{
     }
 };
 
-let updateCredit=async (ctx,next)=>{
+const updateCredit=async (ctx,next)=>{
     let body=ctx.request.body;
     let User=model.User;
     try {
@@ -89,7 +90,7 @@ let updateCredit=async (ctx,next)=>{
     }
 };
 
-let delUser=async (ctx,next)=>{
+const delUser=async (ctx,next)=>{
     let body=ctx.request.body;
     let User=model.User;
     if(!body.phone){
@@ -113,7 +114,7 @@ let delUser=async (ctx,next)=>{
     }
 };
 
-let findUser=async (ctx,next)=>{
+const findUser=async (ctx,next)=>{
     let body=ctx.request.body;
     let User=model.User;
     // if(body.phone&&!util.checkPhone(body.phone)){
@@ -125,7 +126,6 @@ let findUser=async (ctx,next)=>{
         return ;
     }
     try {
-        console.log(body.personalId)
         let user=await User.findOne({
             where:{isDeleted:false,id:body.personalId}
         });
@@ -146,7 +146,7 @@ let findUser=async (ctx,next)=>{
     }
 };
 
-let getUserInfo=async (ctx,next)=>{
+const getUserInfo=async (ctx,next)=>{
     let User=model.User;
     try {
         let uid=await admin.getUid(ctx,next);
@@ -178,7 +178,7 @@ let getUserInfo=async (ctx,next)=>{
     }
 };
 
-let getRangesByCredit=async (ctx,next)=>{
+const getRangesByCredit=async (ctx,next)=>{
     try {
         let uid=await admin.getUid(ctx,next);
         let User=model.User;
@@ -222,7 +222,7 @@ let getRangesByCredit=async (ctx,next)=>{
 
 module.exports = {
     'POST /api/addUser': addUser,
-    'POST /api/updateUser': updateUser,
+    'POST /api/updateUserInfo': updateUserInfo,
     'POST /api/delUser': delUser,
     'POST /api/findUser': findUser,
     'POST /api/getUserInfo': getUserInfo,

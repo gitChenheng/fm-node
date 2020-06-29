@@ -3,6 +3,7 @@ module.exports={
     APP_SECRET:'12323ffbc36e112c5ea847fc76bb5d54',
     ENV_PROD:'production',
     ENV_DEV:'development',
+    JWT_SECRET:'1eaf3h45467gvf_sf23',
     ACCESS_TOKEN:'ACCESS_TOKEN',
     RANGE_AVAILABLE:30,
     ACHIEVE:{

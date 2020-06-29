@@ -45,8 +45,6 @@ let addInfo=async (ctx,next)=>{
                     where:{isDeleted:false,id:authorId}
                 });
                 vo.author=user.name;
-                // console.log('name===',util.uncodeUtf16(user.name))
-
                 let Platform=model.Platform;
                 let platform=await Platform.findOne({
                     where:{isDeleted:false,id:vo.platformId}
