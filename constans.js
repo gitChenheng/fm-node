@@ -5,7 +5,7 @@ module.exports={
     ENV_DEV:'development',
     JWT_SECRET:'1eaf3h45467gvf_sf23',
     ACCESS_TOKEN:'ACCESS_TOKEN',
-    RANGE_AVAILABLE:100,
+    RANGE_AVAILABLE:99,
     ACHIEVE:{
         SIGN_EASY:'1',
         SIGN_EASY_LABEL:'新人报道',
