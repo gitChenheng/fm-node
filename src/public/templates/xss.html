@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta>
+    <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <title>root</title>
+</head>
+<body>
+<input type="text" id="ipt"/>
+<button type="submit" id="submit">发帖</button>
+<div id="postList"></div>
+</body>
+<script>
+    $(function () {
+        $.ajax({
+            url: "http://localhost:3000/api/noteBoard/getNoteBoard",
+            type: "get",
+            contentType: 'application/json;charset=utf-8',
+            dataType: "json",
+            success: function(res){
+                if(res.code==='1'){
+                    const d=res.data;
+                    for (const k of d){
+                        console.log(k.content)
+                        $('#postList').append(`<div>${(k.content)}</div>`);
+                        // document.getElementById('postList').innerText=`<div>${(k.content)}</div>`
+                    }
+                }else{
+                    alert(res.msg)
+                }
+            },
+            error:function(e){
+                console.log(e);
+            }
+        });
+        $('#submit').click(function(){
+            $.ajax({
+                url: "http://localhost:3000/api/noteBoard/pushNote",
+                type: "post",
+                contentType: 'application/json;charset=utf-8',
+                data: JSON.stringify({
+                    content:$("#ipt").val(),
+                }),
+                dataType: "json",
+                success: function(res){
+                    $('#ipt').val('');
+                },
+                error:function(e){
+                    console.log(e);
+                }
+            });
+        })
+    })
+
+    function filterXSS(str) {
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/ /g, '&nbsp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/\r{0,}\n/g, '<br/>')
+    }
+    //开源资源  js-xss   http://jsxss.com/zh/index.html
+
+    function evalScripts(text){
+        var script, scripts;
+        scripts = [];
+        var regexp = /<script[^>]*>([\s\S]*?)<\/script>/gi;
+        while ((script = regexp.exec(text))) scripts.push(script[1]);
+        scripts = scripts.join('\n');
+        if (scripts) (window.execScript) ? window.execScript(scripts) : window.setTimeout(scripts, 0);
+    }
+</script>
+<!--<script src="http://localhost:3000/templates/js/index.js"></script>-->
+</html>

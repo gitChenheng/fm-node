@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>clickHandle</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .mask{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+<iframe src="http://localhost:3000/noteBoard/xss" frameborder="0" width="100%" id="iframe"></iframe>
+<div class="mask" onclick="clickhandle()"></div>
+</body>
+<script>
+    document.getElementById('iframe').style.height=window.screen.availHeight+'px';
+    var clickhandle=function () {
+        alert('handle attack')
+    }
+</script>
+</html>

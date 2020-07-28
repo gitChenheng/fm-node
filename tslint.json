@@ -1,0 +1,33 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "comment-format": [false, "check-space"],// 强制单行注释格式：'//' 后必跟空格
+        "forin": true, // 当使用 for in 语句遍历 object 时，强制使用 if 判断 key 是否由原型链继承 hasOwnProperty
+        "max-classes-per-file": [true, 1],//保证单一职责
+        "max-line-length": [true, 200],// 一行代码长度最长不超过 140 字符
+        "no-console": false,
+        "indent": [true, "spaces", 4],
+        "no-use-before-declare": true,
+        "no-var-keyword": true,
+        "variable-name": [
+            true,
+            "ban-keywords",
+//            "check-format",
+            "allow-leading-underscore"
+        ],
+        "whitespace": [
+            true,
+            "check-branch",
+            "check-decl",
+            "check-operator",
+            "check-separator",
+            "check-type"
+        ],
+        "quotemark": [true, "double"]
+    },
+    "rulesDirectory": []
+}

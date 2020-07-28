@@ -2,27 +2,52 @@
   "name": "fm-node",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/server/index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index"
+    "start": "ts-node src/server/index.ts",
+    "dev": "ts-node src/server/index.ts",
+    "babel-start": "babel-node src/server/index.ts",
+    "lint": "tslint --project ./",
+    "initdb": "ts-node ./src/db/sync-db.ts",
+    "test": "echo \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"Error: no src/os/exec specified\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" && exit 1"
   },
   "author": "ch",
   "license": "ISC",
   "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "bcryptjs": "^2.4.3",
     "fs": "0.0.1-security",
+    "helmet": "^3.23.3",
     "https": "^1.0.0",
     "ioredis": "^4.14.1",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.11.0",
     "koa-body": "^4.1.1",
     "koa-bodyparser": "3.2.0",
+    "koa-helmet": "^5.2.0",
     "koa-router": "7.0.0",
     "koa-sslify": "^4.0.3",
     "koa-static": "^5.0.0",
     "koa2-request": "^1.0.4",
+    "log4js": "^6.3.0",
+    "module-alias": "^2.2.2",
     "mysql": "2.11.1",
+    "mysql2": "^2.1.0",
     "node-require-alias": "^1.0.1",
-    "sequelize": "3.24.1"
+    "reflect-metadata": "^0.1.13",
+    "sequelize": "^4.44.2",
+    "sequelize-typescript": "^0.6.11",
+    "ts-node": "^8.10.2",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.6",
+    "typescript-transform-paths": "^1.1.14",
+    "typings": "^2.1.1",
+    "xss": "^1.0.7"
+  },
+  "_moduleAliases": {
+    "@": "./src/"
   }
 }

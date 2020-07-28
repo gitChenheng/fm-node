@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+ping www.baidu.com
+#ifconfig | grep 'inet'
+#echo "ch"
+#
+#chmod +x exec.bash
+#sh exec.bash

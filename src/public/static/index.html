@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <title>root</title>
+</head>
+<body>
+用户名: <input type="text" id="username" name="username" /><br />
+密　码: <input type="password" id="password" name="password" /><br /><br />
+<button type="submit" id="submit">提交</button>
+<button id="yz">验证</button>
+</body>
+<script>
+    $('#submit').click(function(){
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:3000/api/login",
+            contentType: 'application/json;charset=utf-8',
+            headers:{
+            },
+            data: JSON.stringify({
+                name:$("#username").val(),
+            }),
+            dataType: "json",
+            success: function(res){
+            },
+            error:function(e){
+                console.log(e);
+            }
+        });
+    })
+    $('#yz').click(function () {
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:3000/api/cors",
+            contentType: 'application/json;charset=utf-8',
+            headers:{
+            },
+            dataType: "json",
+            success: function(res){
+                console.log(res);
+            },
+            error:function(e){
+                console.log(e);
+            }
+        });
+    })
+</script>
+</html>
