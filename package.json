@@ -37,7 +37,7 @@
     "mysql2": "^2.1.0",
     "node-require-alias": "^1.0.1",
     "reflect-metadata": "^0.1.13",
-    "sequelize": "^4.44.2",
+    "sequelize": "^5.15.1",
     "sequelize-typescript": "^0.6.11",
     "ts-node": "^8.10.2",
     "tslint": "^6.1.2",
