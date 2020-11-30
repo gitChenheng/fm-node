@@ -8,8 +8,7 @@
     "dev": "ts-node src/server/index.ts",
     "babel-start": "babel-node src/server/index.ts",
     "lint": "tslint --project ./",
-    "initdb": "ts-node ./src/db/sync-db.ts",
-    "test": "echo \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"Error: no src/os/exec specified\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\" && exit 1"
+    "initdb": "ts-node ./src/server/db/sync-db.ts"
   },
   "author": "ch",
   "license": "ISC",

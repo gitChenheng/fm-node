@@ -27,7 +27,7 @@
             "check-separator",
             "check-type"
         ],
-        "quotemark": [true, "double"]
+        "quotemark": [false, "double"]
     },
     "rulesDirectory": []
 }

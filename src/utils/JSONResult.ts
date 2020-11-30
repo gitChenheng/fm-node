@@ -1,26 +1,40 @@
 export default {
-    ok: (data?, msg?: string) => {
+    ok: (data?, msg?: string, status?: number) => {
         return {
-            code: "1",
-            data: data || null,
-            msg: msg || "ok",
+            status: 200,
+            body: {
+                code: status || 200,
+                data: data || null,
+                msg: msg || "Ok",
+            },
         }
     },
-    err: (msg?: string) => {
+    err: (msg?: string, status?: number) => {
         return {
-            code: "0",
-            msg: msg || "unknown_error",
+            status: 400,
+            body: {
+                code: status || 400,
+                msg: msg || "Bad request",
+            },
         }
     },
-    authority: (msg?: string) => {
+    unauthorized: (msg?: string) => {
         return {
-            code: "4",
-            msg: msg || "身份验证失败"
+            code: 401,
+            body: {
+                msg: msg || "Unauthorized to access!",
+            },
+        }
+    },
+    forbidden: (msg?: string) => {
+        return {
+            code: 403,
+            body: {
+                msg: msg || "Forbidden to access!",
+            },
         }
     },
     build: (options) => {
-        return {
-            ...options,
-        }
+        return options
     },
 };
