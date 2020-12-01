@@ -5,7 +5,7 @@ import JSONResult from "@/utils/JSONResult";
 
 export const upload = async (ctx) => {
     const fileName = ctx.request.body.name || generateId(6, 16);
-    const file = ctx.request.files.filename;
+    const file = ctx.request.files.file;
     if (file.size > 10000000){
         ctx.rest(JSONResult.err("上传文件过大，请不要超过10M"));
         return;
@@ -25,7 +25,7 @@ export const upload = async (ctx) => {
     // 创建写入流
     const upStream = fs.createWriteStream(filePath);
     render.pipe(upStream);
-    return `/uploads/${fileName + "." + file.name.split(".").pop()}`;
+    return `/upload/${fileName + "." + file.name.split(".").pop()}`;
     // const files = ctx.request.files.file;
     // for (let file of files) {
     //     // 创建可读流

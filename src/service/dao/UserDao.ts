@@ -24,10 +24,10 @@ export default class UserDao {
         // })
     }
 
-    static async getInCondition(item){
+    static async getInCondition(condition){
         return await User.findOne({
             raw: true,
-            where: item
+            where: condition
         });
     }
 

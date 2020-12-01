@@ -21,7 +21,7 @@ import router, {initRouteHandle} from "@/server/routehandle";
 // import enforceHttps from 'koa-sslify';
 import {info} from "@/utils/log4";
 
-info("this is info")
+// info("this is info")
 
 const app = new Koa();
 

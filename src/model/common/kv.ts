@@ -1,4 +1,4 @@
-import {Table, Column, PrimaryKey, AutoIncrement} from "sequelize-typescript";
+import {Table, Column, PrimaryKey, AutoIncrement, AllowNull} from "sequelize-typescript";
 import { STRING, INTEGER} from "sequelize";
 import BaseEntity from "./BaseEntity";
 
@@ -10,6 +10,7 @@ export default class Kv extends BaseEntity{
     @Column(INTEGER)
     id: number;
 
+    @AllowNull(false)
     @Column(STRING)
     name: string;
 

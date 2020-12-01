@@ -6,8 +6,33 @@ import {setRedisData, getRedisData} from "@/service/common/redisSer";
 import {JWT_SECRET} from "@/constans/global";
 import jwt from "jsonwebtoken";
 import BaseService from "@/service/BaseService";
+import JSONResult from "@/utils/JSONResult";
 
 export default class UserService extends BaseService{
+
+    static async getuid(ctx){
+        const token = ctx.request.header.token;
+        const decodeToken = await getRedisData('token');
+        if (decodeToken){
+            return JSON.parse(decodeToken).uid
+        }else{
+            return await jwt.verify(token, JWT_SECRET, null, async (err, decoded) => {//此处解密为异步
+                if (err){
+                    ctx.type = "application/json";
+                    ctx.status = JSONResult.unauthorized().status;
+                    ctx.body = JSONResult.unauthorized().body
+                }else{
+                    return decoded.uid
+                }
+            });
+        }
+    }
+
+    static async getRole(ctx){
+        const uid = await this.getuid(ctx);
+        const userInfo = await UserDao.getById(uid);
+        return userInfo.role
+    }
 
     static async createToken(uid: string){
         const userInfo = {
@@ -92,9 +117,6 @@ export default class UserService extends BaseService{
             }
         }
         return await this.createToken(itemObj.id);
-        // for (const key in item)
-        //     itemObj[key] = item[key];
-        // return await itemObj.save();
     }
 
 }

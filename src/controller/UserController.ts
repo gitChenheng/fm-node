@@ -5,6 +5,12 @@ import {utf16toEntities} from "@/utils/util";
 import {Controller, RequestMapping, RequestMethod, RequestParams, RequestPrefix, Validate} from "@/decorator/Dcontroller";
 import BaseController from "@/controller/BaseController";
 
+interface ILoginBody {
+    code: string;
+    shareid: string;
+    nickName: string;
+}
+
 @Controller
 @RequestPrefix('/api')
 export default class UserController extends BaseController{
@@ -17,39 +23,33 @@ export default class UserController extends BaseController{
             {name: 'code', require: true},
             {name: 'shareid', require: true},
             {name: 'nickName', require: true},
-        ]) body: {
-            code: string;
-            shareid: string;
-            nickName: string;
-        },
+        ]) body: ILoginBody,
     ) {
         const {code, shareid, nickName} = body;
         try {
-            // const jscode2session = await js_code2_session(code);
-            // if (jscode2session.errcode){
-            //     ctx.rest(JSONResult.err(jscode2session.errmsg))
-            // }else{
-            //     const openid = JSON.parse(jscode2session).openid;
-            //     const userItem = {
-            //         openid,
-            //         ...body,
-            //         name: utf16toEntities(nickName),
-            //         credit: 0,
-            //         balance: 0,
-            //         role: 0,
-            //     };
-            //     delete userItem.code;
-            //     delete userItem.nickName;
-            //     const token = await UserService.updateOrCreateUser(openid, shareid, userItem);
-            //     if (token)
-            //         ctx.rest(JSONResult.ok({token}, "登录成功"));
-            // }
+            const jscode2session = await js_code2_session(code);
+            if (jscode2session.errcode){
+                ctx.rest(JSONResult.err(jscode2session.errmsg))
+            }else{
+                const openid = JSON.parse(jscode2session).openid;
+                const userItem = {
+                    openid,
+                    ...body,
+                    nickName: utf16toEntities(nickName),
+                    credit: 0,
+                    balance: 0,
+                    role: 1,
+                };
+                const token = await UserService.updateOrCreateUser(openid, shareid, userItem);
+                if (token)
+                    ctx.rest(JSONResult.ok({token}, "登录成功"));
+            }
         }catch (e) {
-            throw e;
+            ctx.rest(JSONResult.err(e))
         }
     }
 
-    // @RequestMapping('/getUserInfo', RequestMethod.POST)
+    @RequestMapping('/getUserInfo', RequestMethod.POST)
     public async getUserInfo(ctx) {
         try {
             const uid = await UserService.getUid(ctx);
@@ -60,11 +60,11 @@ export default class UserController extends BaseController{
                 if (res){
                     ctx.rest(JSONResult.ok(res))
                 }else{
-                    ctx.rest(JSONResult.err("未找到用户信息"))
+                    ctx.rest(JSONResult.unauthorized())
                 }
             }
         }catch (e) {
-            throw e;
+            ctx.rest(JSONResult.err(e))
         }
     }
 

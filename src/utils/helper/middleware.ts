@@ -52,7 +52,9 @@ export const verify = () => {
             }else{
                 await jwt.verify(token, JWT_SECRET, null, async (err, decoded) => {//此处解密为异步
                     if (err){
-                        ctx.response.body = JSONResult.unauthorized()
+                        ctx.type = "application/json";
+                        ctx.status = JSONResult.unauthorized().status;
+                        ctx.body = JSONResult.unauthorized().body
                     }else{
                         await next()
                     }
@@ -81,8 +83,3 @@ export const restIfy = () => {
         }
     };
 }
-
-// export const APIError = (code?, msg?: string) => {
-//     this.code = code || "internal:unknown_error";
-//     this.msg = msg || "";
-// };

@@ -1,5 +1,7 @@
-export enum errorCode {
-    SystemError = 12000,
+export enum errCode {
+    unauthorized = 4,
+    forbidden = 5,
 }
 
+export const UNAUTHORIZED = "未找到用户信息";
 export const RISKY_HINT = "检测到违规内容，请修改后重试";

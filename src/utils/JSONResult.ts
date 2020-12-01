@@ -1,35 +1,39 @@
+import {errCode, UNAUTHORIZED} from "@/constans/errcode";
+
 export default {
-    ok: (data?, msg?: string, status?: number) => {
+    ok: (data?, msg?: string, code?: number | string) => {
         return {
             status: 200,
             body: {
-                code: status || 200,
+                code: code || 1,
                 data: data || null,
                 msg: msg || "Ok",
             },
         }
     },
-    err: (msg?: string, status?: number) => {
+    err: (msg?: string, code?: number | string) => {
         return {
             status: 400,
             body: {
-                code: status || 400,
+                code: code || 2,
                 msg: msg || "Bad request",
             },
         }
     },
     unauthorized: (msg?: string) => {
         return {
-            code: 401,
+            status: 200,
             body: {
-                msg: msg || "Unauthorized to access!",
+                code: errCode.unauthorized,
+                msg: msg || UNAUTHORIZED || "Unauthorized to access!",
             },
         }
     },
     forbidden: (msg?: string) => {
         return {
-            code: 403,
+            status: 200,
             body: {
+                code: errCode.forbidden,
                 msg: msg || "Forbidden to access!",
             },
         }
