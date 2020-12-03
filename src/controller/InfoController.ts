@@ -47,6 +47,25 @@ export default class UserController{
     }
 
     @Validate
+    @RequestMapping('/getInfoDetail', RequestMethod.POST)
+    public async getInfoDetail(
+        ctx,
+        @RequestParams({name: 'id', require: true}) body
+    ){
+        const {id} = body;
+        try {
+            const res = await InfoService.getInfoById(id);
+            if (res){
+                ctx.rest(JSONResult.ok(res))
+            }else{
+                ctx.rest(JSONResult.ok(null, '无法查询到该爆料', 2));
+            }
+        }catch (e) {
+            ctx.rest(JSONResult.err(e));
+        }
+    }
+
+    @Validate
     @RequestMapping('/findInfoConditional', RequestMethod.POST)
     public async findInfoConditional(
         ctx,
@@ -58,12 +77,11 @@ export default class UserController{
             {name: 'pageSize', require: true},
         ]) body
     ){
-        const {reviewStatus} = body;
+        const {reviewStatus, typeid, platformid, search, pageIndex, pageSize} = body;
         if (reviewStatus !== 0 && reviewStatus !== 1 && reviewStatus !== 2){
-            ctx.rest(JSONResult.ok(null, "lack of param reviewStatus", 2));
+            ctx.rest(JSONResult.ok(null, "lack of param reviewStatus or reviewStatus beyond the scope", 2));
         }
         try {
-            const {typeid, platformid, search, pageIndex, pageSize} = body;
             const res = await InfoService.getInfoInConditional(body);
             if (res)
                 return ctx.rest(JSONResult.ok(res));

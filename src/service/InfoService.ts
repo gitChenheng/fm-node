@@ -3,11 +3,21 @@ import TypeDao from "@/service/dao/Type";
 import PlatformDao from "@/service/dao/PlatformDap";
 import UserDao from "@/service/dao/UserDao";
 import {Sequelize} from "sequelize";
+import {timeFormat} from "@/utils/util";
 
 export default class InfoService{
 
     static async getAllInfos(){
         return InfoDao.getAllItems();
+    }
+
+    static async getInfoById(id){
+        const res = await InfoDao.getById(id);
+        const platform = await PlatformDao.getById(res.platformid);
+        res.platformImgUrl = platform.platformImgUrl;
+        res.startAt = timeFormat(res.startAt);
+        res.endAt = timeFormat(res.endAt);
+        return res;
     }
 
     static async getInfoInConditional(item){

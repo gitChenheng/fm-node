@@ -43,12 +43,33 @@ export const checkPhone = (phone) => {
     return /^1[3456789]\d{9}$/.test(phone)
 }
 
+export const formatNumberToTwo = ( n: string | number) => {
+    if (Number(n) < 10){
+        return "0" + n;
+    }
+    return String(n);
+}
+
 export const decodeDate = (date, hms) => {
     if (hms){
-        return new Date(date).getFullYear() + "-" + (Number(new Date(date).getMonth()) + 1) + "-" + new Date(date).getDate() + `${hms && (
-            " " + new Date(date).getHours() + ":" + new Date(date).getMinutes() + ":" + new Date(date).getSeconds()
-        )}`;
+        if (!date){
+            return ""
+        }
+        return new Date(date).getFullYear() + "-" + (Number(new Date(date).getMonth()) + 1) + "-" + new Date(date).getDate() +
+            `${hms && (" " + new Date(date).getHours() + ":" + formatNumberToTwo(new Date(date).getMinutes()) + ":" +
+                formatNumberToTwo(new Date(date).getSeconds()))}`;
     }else{
+        if (!date){
+            return ""
+        }
         return new Date(date).getFullYear() + "-" + (Number(new Date(date).getMonth()) + 1) + "-" + new Date(date).getDate()
     }
+}
+
+export const timeFormat = (date: any) => {
+    // return time ? new Date(time).toLocaleString("chinese", {
+    //     timeZone: zone || "Asia/Shanghai", hour12: false,
+    //     year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit"
+    // }) : ""
+    return decodeDate(date, true)
 }

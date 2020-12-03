@@ -48,11 +48,11 @@ export default class Info extends BaseEntity{
 
     @AllowNull
     @Column({type: DATE, field: 'start_at'})
-    public startAt: Date;
+    public startAt: Date | string | number;
 
     @AllowNull
     @Column({type: DATE, field: 'end_at'})
-    public endAt: Date;
+    public endAt: Date | string | number;
 
     @ForeignKey(() => User)
     @Column(STRING)

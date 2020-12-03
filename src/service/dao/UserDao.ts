@@ -1,6 +1,5 @@
 import User from "@/model/entity/User";
 import {generateId} from "@/utils/util";
-import {dbCtx} from "@/server/db/db_context";
 
 export default class UserDao {
 
@@ -13,15 +12,6 @@ export default class UserDao {
             raw: true,
             where: {openid}
         });
-        // const db = dbCtx();
-        // return await db.query(`SELECT count(*) FROM users where openid=:openid`, {
-        //     types: db.QueryTypes.SELECT,
-        //     plain: false,
-        //     raw: true,
-        //     replacements: {
-        //         openid,
-        //     }
-        // })
     }
 
     static async getInCondition(condition){
@@ -43,7 +33,6 @@ export default class UserDao {
     }
 
     static async updateItemInCondition(item, condition){
-        console.log(123,condition)
         await User.update(
             item,
             {where: condition}
