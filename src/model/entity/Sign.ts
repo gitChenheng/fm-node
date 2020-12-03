@@ -8,9 +8,6 @@ export default class Sign extends BaseEntity{
     @Column(STRING)
     public uid: string;
 
-    @Column(STRING)
-    public name: string;
-
     @AllowNull
     @Column(TEXT)
     public address: string;

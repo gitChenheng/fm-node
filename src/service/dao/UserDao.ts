@@ -4,7 +4,7 @@ import {dbCtx} from "@/server/db/db_context";
 
 export default class UserDao {
 
-    static async getById (id) {
+    static async getById (id): Promise<any>{
         return await User.findOne({raw: true, where: {id}})
     }
 
@@ -43,8 +43,9 @@ export default class UserDao {
     }
 
     static async updateItemInCondition(item, condition){
-        return await User.update(
-            {item},
+        console.log(123,condition)
+        await User.update(
+            item,
             {where: condition}
         )
     }

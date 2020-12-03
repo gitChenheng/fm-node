@@ -26,7 +26,7 @@ export default class SignDao {
 
     static async updateItemInCondition(item, condition){
         return await Sign.update(
-            {item},
+            item,
             {where: condition}
         )
     }

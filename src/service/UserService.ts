@@ -7,6 +7,7 @@ import {JWT_SECRET} from "@/constans/global";
 import jwt from "jsonwebtoken";
 import BaseService from "@/service/BaseService";
 import JSONResult from "@/utils/JSONResult";
+import SignDao from "@/service/dao/SignDao";
 
 export default class UserService extends BaseService{
 
@@ -28,13 +29,18 @@ export default class UserService extends BaseService{
         }
     }
 
-    static async getRole(ctx){
+    static async getRole(ctx): Promise<number>{
         const uid = await this.getuid(ctx);
         const userInfo = await UserDao.getById(uid);
         return userInfo.role
     }
 
-    static async createToken(uid: string){
+    static async isAdmin(ctx): Promise<boolean>{
+        const role = await this.getRole(ctx);
+        return role === 10;
+    }
+
+    static async createToken(uid: string): Promise<string>{
         const userInfo = {
             uid,
             timestamp: Date.now(),
@@ -44,7 +50,7 @@ export default class UserService extends BaseService{
         return token;
     }
 
-    static async getUid(ctx){
+    static async getUid(ctx): Promise<string | null>{
         const token = ctx.request.header.token;
         if (token){
             const userInfo = await getRedisData(token);
@@ -64,38 +70,17 @@ export default class UserService extends BaseService{
         }
     }
 
-    static async getUserById(uid: string){
+    static async getUserById(uid: string): Promise<any>{
         return await UserDao.getById(uid);
     }
 
-    static async changeUserInfo(item, condition) {
+    static async changeUserInfo(item, condition): Promise<void>{
         await UserDao.updateItemInCondition(item, condition);
     }
 
-    static async getAllUsers(){
+    static async getAllUsers(): Promise<any[]>{
         return await UserDao.getAllItems();
     }
-
-    // static async signIn(name: any, pwd: any){
-    //     const user = await getByName(name);
-    //     const hashResult = await _compare(String(pwd), String(user.pwd));
-    //     const date = new Date();
-    //     if (hashResult) {
-    //         const userInfo = {
-    //             uid: id,
-    //             timestamp: date.getTime()
-    //         };
-    //         const token = sign(userInfo);
-    //         await newRedis.set(token, JSON.stringify(userInfo));
-    //         await newRedis.expire(token, 30 * 24 * 60 * 60);
-    //         return token;
-    //     }
-    //     if (hashResult){
-    //         return user;
-    //     }else{
-    //         return false;
-    //     }
-    // }
 
     static async addUser(obj){
         return await UserDao.createItem({

@@ -5,6 +5,6 @@ export const _hash = async (pwd: string) => {
     return await bcrypt.hash(pwd, saltRounds);
 }
 
-export const _compare = async (pwd: string, hash: string) => {
+export const _compare = async (pwd: string, hash: string) => {//pwd：输入; hash：encode_hash
     return await bcrypt.compare(pwd, hash);
 }

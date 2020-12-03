@@ -35,8 +35,8 @@ export default class AdminController{
         @RequestParams({name: 'platformId', require: true}) body
     ){
         try {
-            const role = await UserService.getRole(ctx);
-            if (role){
+            const isAdmin = await UserService.isAdmin(ctx);
+            if (isAdmin){
                 const id = body.platformId;
                 const platform = await AdminService.findPlatform(id);
                 if (platform){
@@ -47,7 +47,7 @@ export default class AdminController{
                     ctx.rest(JSONResult.ok(null, '未查询到相关平台', 2));
                 }
             }else{
-                ctx.rest(JSONResult.unauthorized())
+                ctx.rest(JSONResult.err('无权限'))
             }
         }catch (e) {
             ctx.rest(JSONResult.err(e))

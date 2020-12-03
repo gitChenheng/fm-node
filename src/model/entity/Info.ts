@@ -1,6 +1,9 @@
-import {Table, Column, AllowNull} from "sequelize-typescript";
+import {Table, Column, AllowNull, ForeignKey, BelongsTo} from "sequelize-typescript";
 import { STRING, DATE, INTEGER, TINYINT, BIGINT, TEXT, DECIMAL, BOOLEAN } from "sequelize";
 import BaseEntity from "../common/BaseEntity";
+import Type from "@/model/entity/Type";
+import Platform from "@/model/entity/Platform";
+import User from "@/model/entity/User";
 
 @Table({tableName: "info"})
 export default class Info extends BaseEntity{
@@ -23,13 +26,21 @@ export default class Info extends BaseEntity{
     @Column(TINYINT)//活动星级
     public level: number;
 
+    @ForeignKey(() => Type)
     @AllowNull
     @Column(INTEGER)
     public typeid: number;
 
+    @BelongsTo(() => Type)
+    public type?: Type;
+
+    @ForeignKey(() => Platform)
     @AllowNull
     @Column(INTEGER)
     public platformid: number;
+
+    @BelongsTo(() => Platform)
+    public platform?: Platform;
 
     @AllowNull
     @Column(INTEGER)
@@ -43,8 +54,12 @@ export default class Info extends BaseEntity{
     @Column({type: DATE, field: 'end_at'})
     public endAt: Date;
 
+    @ForeignKey(() => User)
     @Column(STRING)
     public uid: string;
+
+    @BelongsTo(() => User, 'user_info')
+    public user?: User;
 
     @AllowNull
     @Column(BIGINT)
@@ -59,7 +74,7 @@ export default class Info extends BaseEntity{
     public free: boolean;
 
     @AllowNull
-    @Column(TEXT)
+    @Column({type: TEXT, field: 'reject_reason'})
     public rejectReason: string;
 
     @AllowNull
@@ -73,4 +88,5 @@ export default class Info extends BaseEntity{
     @AllowNull
     @Column(TEXT)
     public details: string;
+
 }
