@@ -3,6 +3,9 @@ import {Controller, RequestMapping, RequestMethod, RequestParams, RequestPrefix,
 import InfoService from "@/service/InfoService";
 import UserService from "@/service/UserService";
 import ParticipateService from "@/service/ParticipateService";
+import {upload} from "@/service/common/upload";
+import {get_access_token, msg_sec_check} from "@/service/common/wx";
+import {errCode, RISKY_HINT} from "@/constans/errcode";
 
 interface IInfoBody {
     reviewStatus?: number;
@@ -115,6 +118,16 @@ export default class UserController{
         }
     }
 
+    @RequestMapping('/uploadInfoImg', RequestMethod.POST)
+    public async uploadInfoImg(ctx){
+        try {
+            const filePath = await upload(ctx);
+            ctx.rest(JSONResult.ok(filePath));
+        }catch (e) {
+            ctx.rest(JSONResult.err(e));
+        }
+    }
+
     @Validate
     @RequestMapping('/knockInfo', RequestMethod.POST)
     public async knockInfo(
@@ -136,8 +149,21 @@ export default class UserController{
             body.uid = await UserService.getuid(ctx);
             body.reviewStatus = 0;
             body.credit = 0;
-            await InfoService.knockInfo(body);
-            ctx.rest(JSONResult.ok(null, "提交成功，请等待审核"));
+            const at = await get_access_token();
+            if (at.errcode){
+                ctx.rest(JSONResult.ok(null, at.errmsg, 2))
+            }else{
+                const access_token = at.access_token;
+                const msg_sec_res = await msg_sec_check(access_token, JSON.stringify(body));
+                if (msg_sec_res.errcode === errCode.msg_sec_err){
+                    ctx.rest(JSONResult.ok(null, RISKY_HINT, 2))
+                }else if (msg_sec_res.errcode){
+                    ctx.rest(JSONResult.ok(null, msg_sec_res.errmsg, 2))
+                }else {
+                    await InfoService.knockInfo(body);
+                    ctx.rest(JSONResult.ok(null, "提交成功，请等待审核"));
+                }
+            }
         }catch (e) {
             ctx.rest(JSONResult.err(e));
         }

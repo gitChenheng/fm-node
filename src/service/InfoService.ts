@@ -6,6 +6,7 @@ import {Sequelize} from "sequelize";
 import {timeFormat} from "@/utils/util";
 import ParticipateDao from "@/service/dao/ParticipateDao";
 import UserService from "@/service/UserService";
+import {get_access_token} from "@/service/common/wx";
 
 export default class InfoService{
 

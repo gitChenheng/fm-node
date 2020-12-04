@@ -1,6 +1,7 @@
 export enum errCode {
     unauthorized = 4,
     forbidden = 5,
+    msg_sec_err = 87014,
 }
 
 export const UNAUTHORIZED = "未找到用户信息";
