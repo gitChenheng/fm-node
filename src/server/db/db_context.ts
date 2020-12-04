@@ -6,6 +6,11 @@ import {info} from "@/utils/log4";
 
 let db_context: Sequelize = null;
 
+/**
+ * mysql 操作手册
+ * from_unixtime/unix_timestamp 日期/时间戳 互转
+ */
+
 export const createDbContext = () => {
     db_context = new Sequelize({
         ...config.mysql,

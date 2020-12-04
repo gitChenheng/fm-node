@@ -24,15 +24,18 @@ export default class InfoDao {
             i.id,i.name,i.initiator,i.price,i.review_status AS reviewStatus,i.level,
             i.typeid,i.platformid,i.start_at AS startAt,i.end_at AS endAt,i.uid,i.credit,
             i.anonymous,i.free,i.reject_reason AS rejectReason,i.details,i.created_at AS createdAt,
-            p.platform_img_url AS platformImgUrl
+            p.platform_img_url AS platformImgUrl,
+            CASE WHEN pa.deleted_at IS NULL THEN 1 ELSE 0 END AS participate
             from info i
             LEFT JOIN platform p
             ON i.platformid=p.id
+            LEFT JOIN participate pa
+            ON i.id=pa.infoid
             WHERE i.review_status=:reviewStatus
-            and i.typeid${typeid ? `=:typeid` : ` IS NOT NULL`}
-            and i.platformid${platformid ? `=:platformid` : ` IS NOT NULL`}
-            and i.name like :search
-            and i.deleted_at IS NULL
+            AND i.typeid${typeid ? `=:typeid` : ` IS NOT NULL`}
+            AND i.platformid${platformid ? `=:platformid` : ` IS NOT NULL`}
+            AND i.name like :search
+            AND i.deleted_at IS NULL
             ORDER BY i.created_at DESC
             LIMIT :offset,:pageSize;
             `,
@@ -87,6 +90,36 @@ export default class InfoDao {
 
     static async getAllItems(){
         return await Info.findAll();
+    }
+
+    static async getMyItems(id, pageIndex, pageSize): Promise<Info[any]>{
+        const db = dbCtx();
+        return await db.query(
+            `SELECT
+            i.id,i.name,i.initiator,i.price,i.review_status AS reviewStatus,i.level,
+            i.typeid,i.platformid,i.start_at AS startAt,i.end_at AS endAt,i.uid,i.credit,
+            i.anonymous,i.free,i.reject_reason AS rejectReason,i.details,i.created_at AS createdAt,
+            p.name AS platform,p.platform_img_url AS platformImgUrl,
+            t.name AS type
+            from info i
+            LEFT JOIN platform p
+            ON i.platformid=p.id
+            LEFT JOIN type t
+            ON i.typeid=t.id
+            WHERE uid=:id AND i.deleted_at IS NULL
+            ORDER BY i.created_at DESC
+            LIMIT :offset,:pageSize;
+            `,
+            {
+                type: db.QueryTypes.SELECT,
+                plain: false,
+                raw: true,
+                replacements: {
+                    id,
+                    offset: (Number(pageIndex) - 1) * Number(pageSize),
+                    pageSize
+                }
+            })
     }
 
     static async updateItemById(item, id){

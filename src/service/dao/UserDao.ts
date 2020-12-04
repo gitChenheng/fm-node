@@ -26,10 +26,7 @@ export default class UserDao {
     }
 
     static async updateItemById(item, id){
-        const itemObj = await this.getById(id);
-        for (const key in item)
-            itemObj[key] = item[key];
-        return await itemObj.save();
+        await this.updateItemInCondition(item, {id});
     }
 
     static async updateItemInCondition(item, condition){

@@ -6,6 +6,8 @@ import {Controller, RequestMapping, RequestMethod, RequestParams, RequestPrefix,
 import BaseController from "@/controller/BaseController";
 import Sequelize from "sequelize";
 import SignService from "@/service/SignService";
+import fs from "fs";
+import User from "@/model/entity/User";
 
 interface ILoginBody {
     code: string;
@@ -77,6 +79,22 @@ export default class UserController extends BaseController{
         }
     }
 
+    @Validate
+    @RequestMapping('/updateUserInfo', RequestMethod.POST)
+    public async updateUserInfo(
+        ctx,
+        @RequestParams({name: 'address', require: true}) body
+    ){
+        try {
+            const {address} = body;
+            const id = await UserService.getUid(ctx);
+            await UserService.changeUserInfo({address}, {id});
+            ctx.rest(JSONResult.ok());
+        }catch (e) {
+            ctx.rest(JSONResult.err(e));
+        }
+    }
+
     @RequestMapping('/sign', RequestMethod.POST)
     public async sign(ctx){
         try {
@@ -139,7 +157,16 @@ export default class UserController extends BaseController{
         }
     }
 
-
+    @RequestMapping('/getAddressList')
+    public async getAddressList(ctx){
+        try {
+            const addressJSONFile = fs.readFileSync(`${process.cwd()}/utils/address.json`).toString();
+            const adrObjArr = JSON.parse(addressJSONFile);
+            ctx.rest(JSONResult.ok(adrObjArr))
+        }catch (e) {
+            ctx.rest(JSONResult.err(e));
+        }
+    }
     // @View
     // public async login(ctx){
     //     ctx.types = "text/html;charset=utf-8";

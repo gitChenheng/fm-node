@@ -5,11 +5,9 @@ import Sequelize from "sequelize";
 import {setRedisData, getRedisData} from "@/service/common/redisSer";
 import {JWT_SECRET} from "@/constans/global";
 import jwt from "jsonwebtoken";
-import BaseService from "@/service/BaseService";
 import JSONResult from "@/utils/JSONResult";
-import SignDao from "@/service/dao/SignDao";
 
-export default class UserService extends BaseService{
+export default class UserService{
 
     static async getuid(ctx){
         const token = ctx.request.header.token;

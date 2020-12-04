@@ -2,6 +2,7 @@ import JSONResult from "../utils/JSONResult";
 import {Controller, RequestMapping, RequestMethod, RequestParams, RequestPrefix, Validate} from "@/decorator/Dcontroller";
 import InfoService from "@/service/InfoService";
 import UserService from "@/service/UserService";
+import ParticipateService from "@/service/ParticipateService";
 
 interface IInfoBody {
     reviewStatus?: number;
@@ -31,15 +32,19 @@ interface IReviewInfoBody {
     credit?: number;
     rejectReason?: string;
 }
+interface IActParticipateBody {
+    infoid: number;
+    tag: boolean;
+}
 
 @Controller
 @RequestPrefix('/api')
 export default class UserController{
 
-    @RequestMapping('/getAllInfos', RequestMethod.POST)
-    public async getAllInfos(ctx) {
+    @RequestMapping('/getAllListOfAward', RequestMethod.POST)
+    public async getAllListOfAward(ctx) {
         try {
-            const res = await InfoService.getAllInfos();
+            const res = await InfoService.getAllListOfAward();
             ctx.rest(JSONResult.ok(res));
         }catch (e) {
             ctx.rest(JSONResult.err(e));
@@ -47,19 +52,18 @@ export default class UserController{
     }
 
     @Validate
-    @RequestMapping('/getInfoDetail', RequestMethod.POST)
-    public async getInfoDetail(
+    @RequestMapping('/getMyInfos', RequestMethod.POST)
+    public async getMyInfos(
         ctx,
-        @RequestParams({name: 'id', require: true}) body
-    ){
-        const {id} = body;
+        @RequestParams([
+            {name: 'pageIndex', require: true},
+            {name: 'pageSize', require: true},
+        ]) body
+    ) {
+        const {pageIndex, pageSize} = body;
         try {
-            const res = await InfoService.getInfoById(id);
-            if (res){
-                ctx.rest(JSONResult.ok(res))
-            }else{
-                ctx.rest(JSONResult.ok(null, '无法查询到该爆料', 2));
-            }
+            const res = await InfoService.getMyInfos(ctx, pageIndex, pageSize);
+            ctx.rest(JSONResult.ok(res));
         }catch (e) {
             ctx.rest(JSONResult.err(e));
         }
@@ -92,11 +96,20 @@ export default class UserController{
         }
     }
 
-    @RequestMapping('/getAllListOfAward', RequestMethod.POST)
-    public async getAllListOfAward(ctx) {
+    @Validate
+    @RequestMapping('/getInfoDetail', RequestMethod.POST)
+    public async getInfoDetail(
+        ctx,
+        @RequestParams({name: 'id', require: true}) body
+    ){
+        const {id} = body;
         try {
-            const res = await InfoService.getAllListOfAward();
-            ctx.rest(JSONResult.ok(res));
+            const res = await InfoService.getInfoById(id);
+            if (res){
+                ctx.rest(JSONResult.ok(res))
+            }else{
+                ctx.rest(JSONResult.ok(null, '无法查询到该爆料', 2));
+            }
         }catch (e) {
             ctx.rest(JSONResult.err(e));
         }
@@ -154,6 +167,29 @@ export default class UserController{
                 body.credit = Number(body.level) * 10;
             }
             await InfoService.reviewInfo(body, body.id);
+            ctx.rest(JSONResult.ok());
+        }catch (e) {
+            ctx.rest(JSONResult.err(e));
+        }
+    }
+
+    @Validate
+    @RequestMapping('/actParticipate', RequestMethod.POST)
+    public async actParticipate(
+        ctx,
+        @RequestParams([
+            {name: 'infoid', require: true},
+            {name: 'tag', require: true},
+        ]) body: IActParticipateBody
+    ){
+        const uid = await UserService.getUid(ctx);
+        const {infoid, tag} = body;
+        try {
+            if (tag){
+                await ParticipateService.findUpdateOrCreateParticipate({uid, infoid});
+            }else{
+                await ParticipateService.deleteParticipate({uid, infoid});
+            }
             ctx.rest(JSONResult.ok());
         }catch (e) {
             ctx.rest(JSONResult.err(e));
