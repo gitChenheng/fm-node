@@ -1,6 +1,7 @@
-import {Table, Column, AllowNull} from "sequelize-typescript";
+import {Table, Column, AllowNull, ForeignKey, BelongsTo} from "sequelize-typescript";
 import { STRING, TEXT, INTEGER } from "sequelize";
 import BaseEntity from "../common/BaseEntity";
+import User from "@/model/entity/User";
 
 @Table({tableName: "message_board"})
 export default class MessageBoard extends BaseEntity{
@@ -12,7 +13,11 @@ export default class MessageBoard extends BaseEntity{
     @Column(TEXT)
     public content: string;
 
+    @ForeignKey(() => User)
     @Column(STRING)
     public uid: string;
+
+    @BelongsTo(() => User)
+    public user: User;
 
 }

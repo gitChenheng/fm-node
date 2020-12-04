@@ -23,7 +23,7 @@ export default class TypeDao {
 
     static async updateItemInCondition(item, condition){
         return await Type.update(
-            {item},
+            item,
             {where: condition}
         )
     }

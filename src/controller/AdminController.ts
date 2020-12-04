@@ -1,7 +1,7 @@
 import JSONResult from "../utils/JSONResult";
 import {Controller, RequestMapping, RequestMethod, RequestParams, RequestPrefix, Validate} from "@/decorator/Dcontroller";
 import PlatformDao from "@/service/dao/PlatformDap";
-import TypeDao from "@/service/dao/Type";
+import TypeDao from "@/service/dao/TypeDao";
 import AdminService from "@/service/AdminService";
 import {upload} from "@/service/common/upload";
 import UserDao from "@/service/dao/UserDao";

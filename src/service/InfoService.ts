@@ -1,5 +1,5 @@
 import InfoDao from "@/service/dao/InfoDao";
-import TypeDao from "@/service/dao/Type";
+import TypeDao from "@/service/dao/TypeDao";
 import PlatformDao from "@/service/dao/PlatformDap";
 import UserDao from "@/service/dao/UserDao";
 import {Sequelize} from "sequelize";
