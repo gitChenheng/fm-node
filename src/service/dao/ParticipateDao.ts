@@ -49,7 +49,8 @@ export default class ParticipateDao {
 
     static async destroyItem(item){
         await Participate.destroy({
-            where: item
+            where: item,
+            force: true,
         });
     }
 

@@ -72,6 +72,11 @@ export default class UserService{
         return await UserDao.getById(uid);
     }
 
+    static async getUserInfo(ctx): Promise<any>{
+        const uid = await this.getUid(ctx);
+        return await this.getUserById(uid);
+    }
+
     static async changeUserInfo(item, condition): Promise<void>{
         await UserDao.updateItemInCondition(item, condition);
     }

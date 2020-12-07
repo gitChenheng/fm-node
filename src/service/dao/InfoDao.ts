@@ -4,7 +4,7 @@ import {Sequelize} from "sequelize-typescript";
 
 export default class InfoDao {
 
-    static async getById (id): Promise<Info> {
+    static async getById (id): Promise<any> {
         return await Info.findOne({raw: true, where: {id}})
     }
 
@@ -24,8 +24,10 @@ export default class InfoDao {
             i.id,i.name,i.initiator,i.price,i.review_status AS reviewStatus,i.level,
             i.typeid,i.platformid,i.start_at AS startAt,i.end_at AS endAt,i.uid,i.credit,
             i.anonymous,i.free,i.reject_reason AS rejectReason,i.details,i.created_at AS createdAt,
-            p.platform_img_url AS platformImgUrl,
-            CASE WHEN pa.deleted_at IS NULL THEN 1 ELSE 0 END AS participate
+            p.platform_img_url AS platformImgUrl,p.name AS platform,
+            CASE WHEN pa.created_at IS NULL THEN 0 ELSE 1 END AS participate,
+            CASE WHEN i.start_at < now() THEN 1 ELSE 0 END AS ifBegin,
+            CASE WHEN i.end_at < now() THEN 1 ELSE 0 END AS ifEnd
             from info i
             LEFT JOIN platform p
             ON i.platformid=p.id

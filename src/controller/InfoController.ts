@@ -108,6 +108,10 @@ export default class UserController{
         const {id} = body;
         try {
             const res = await InfoService.getInfoById(id);
+            if (!res.anonymous){
+                const userInfo = await UserService.getUserInfo(ctx);
+                res.nickName = userInfo.nickName;
+            }
             if (res){
                 ctx.rest(JSONResult.ok(res))
             }else{
@@ -212,7 +216,7 @@ export default class UserController{
         const {infoid, tag} = body;
         try {
             if (tag){
-                await ParticipateService.findUpdateOrCreateParticipate({uid, infoid});
+                await ParticipateService.addParticipate({uid, infoid});
             }else{
                 await ParticipateService.deleteParticipate({uid, infoid});
             }

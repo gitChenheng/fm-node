@@ -2,7 +2,6 @@
 
 # node.js
 node_modules/
-public/uploads/
 npm-debug.log
 
 **/*.log
@@ -11,7 +10,7 @@ npm-debug.log
 
 yarn-error.log
 
-**/uploads/
+**/upload/
 
 others/
 **/other

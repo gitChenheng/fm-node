@@ -1,24 +1,30 @@
 import User from "@/model/entity/User";
-import {generateId} from "@/utils/util";
+import {generateId, uncodeUtf16} from "@/utils/util";
 
 export default class UserDao {
 
     static async getById (id): Promise<any>{
-        return await User.findOne({raw: true, where: {id}})
+        const res = await User.findOne({raw: true, where: {id}})
+        res.nickName = uncodeUtf16(res.nickName);
+        return res;
     }
 
     static async getByOpenid(openid){
-        return await User.findOne({
+        const res = await User.findOne({
             raw: true,
             where: {openid}
         });
+        res.nickName = uncodeUtf16(res.nickName);
+        return res;
     }
 
     static async getInCondition(condition){
-        return await User.findOne({
+        const res = await User.findOne({
             raw: true,
             where: condition
         });
+        res.nickName = uncodeUtf16(res.nickName);
+        return res;
     }
 
     static async getAllItems(){

@@ -27,11 +27,10 @@ export default class InfoService{
 
     static async getInfoById(id){
         const res = await InfoDao.getById(id);
-        const participate = await ParticipateDao.queryInCondition({uid: res.uid, infoid: id});
-        if (participate.length){
-            res.participate = !participate[0].deleted_at;
-        }
+        const participateArray = await ParticipateDao.queryInCondition({uid: res.uid, infoid: id});
+        res.participate = participateArray.length;
         const platform = await PlatformDao.getById(res.platformid);
+        res.platform = platform.name;
         res.platformImgUrl = platform.platformImgUrl;
         res.startAt = timeFormat(res.startAt);
         res.endAt = timeFormat(res.endAt);
