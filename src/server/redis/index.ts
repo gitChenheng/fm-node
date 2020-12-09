@@ -1,16 +1,19 @@
 import Redis from "ioredis";
 import config from "@/config/config";
 
-let redisInstance: Redis = null;
+export default class RedisSingleton{
 
-export const createRedisIns = () => {
-    redisInstance = new Redis(config.redis);
-    return redisInstance;
+    private static redisInstance: Redis = null;
+
+    public static createRedisInstance(): void {
+        this.redisInstance = new Redis(config.redis);
+    }
+
+    public static getRedisInstance(): Redis{
+        if (this.redisInstance === null){
+            this.createRedisInstance();
+        }
+        return this.redisInstance;
+    }
+
 }
-
-export const getRedisIns = () => {
-    return redisInstance;
-}
-
-// const newRedis = new Redis(config.redis);
-// export default newRedis;

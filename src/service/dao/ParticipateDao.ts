@@ -1,5 +1,5 @@
 import Participate from "@/model/entity/Participate";
-import {dbCtx} from "@/server/db/db_context";
+import DbSingleton from "@/server/db/db_context";
 
 export default class ParticipateDao {
 
@@ -8,7 +8,7 @@ export default class ParticipateDao {
     }
 
     static async queryInCondition(condition){
-        const db = dbCtx();
+        const db = DbSingleton.dbCtx();
         return await db.query(`SELECT * FROM participate WHERE uid=:uid AND infoid=:infoid;`,
             {
             type: db.QueryTypes.SELECT,
@@ -55,7 +55,7 @@ export default class ParticipateDao {
     }
 
     static async restoreItem(condition){
-        const db = dbCtx();
+        const db = DbSingleton.dbCtx();
         await db.query(`UPDATE participate SET deleted_at=NULL WHERE uid=:uid AND infoid=:infoid;`,
             {
                 type: db.QueryTypes.UPDATE,
@@ -66,9 +66,6 @@ export default class ParticipateDao {
                     infoid: Number(condition.infoid),
                 }
             })
-    }
-
-    static async findOrCreateItem(id, item){
     }
 
 }

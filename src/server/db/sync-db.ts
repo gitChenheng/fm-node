@@ -1,6 +1,6 @@
-import {createDbContext} from "./db_context";
+import DbSingleton from "./db_context";
 
-createDbContext().sync({
+DbSingleton.dbCtx().sync({
     // alter: true
 }).then(() => {
     console.log("entities sync finished");

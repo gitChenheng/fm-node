@@ -4,7 +4,6 @@ import PlatformDao from "@/service/dao/PlatformDap";
 import TypeDao from "@/service/dao/TypeDao";
 import AdminService from "@/service/AdminService";
 import {upload} from "@/service/common/upload";
-import UserDao from "@/service/dao/UserDao";
 import UserService from "@/service/UserService";
 
 @Controller

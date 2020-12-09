@@ -14,21 +14,22 @@ import bodyParser from "koa-bodyparser";
 import koaBody from "koa-body";
 import helmet from "koa-helmet";
 import {cors, verify, restIfy} from "@/utils/helper/middleware";
-import {createDbContext} from "@/server/db/db_context";
-import {createRedisIns} from "@/server/redis";
+import DbSingleton from "@/server/db/db_context";
+import RedisSingleton from "@/server/redis";
 import {httpLogger} from "@/utils/logUtil/logger";
 import router, {initRouteHandle} from "@/server/routehandle";
-// import enforceHttps from 'koa-sslify';
 import {info} from "@/utils/log4";
 
 // info("this is info")
 
 const app = new Koa();
 
-createDbContext();
-createRedisIns();
+DbSingleton.createDbContext();
+RedisSingleton.createRedisInstance();
 app.use(helmet());
-// app.use(enforceHttps()); // process.env.NODE_ENV === ENV_PROD
+if (process.env.NODE_ENV === ENV_PROD){
+    import('koa-sslify').then(enforceHttps => app.use(enforceHttps()));
+}
 /**
  * maxage浏览器缓存的最大寿命（以毫秒为单位）。默认为0
  * hidden允许传输隐藏文件。默认为false
@@ -90,6 +91,3 @@ if (process.env.NODE_ENV === ENV_PROD){
     //     })
     // })
 }
-
-
-

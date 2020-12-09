@@ -4,6 +4,7 @@ import BaseEntity from "../common/BaseEntity";
 import Type from "@/model/entity/Type";
 import Platform from "@/model/entity/Platform";
 import User from "@/model/entity/User";
+import Method from "@/model/entity/Method";
 
 @Table({tableName: "info"})
 export default class Info extends BaseEntity{
@@ -42,9 +43,13 @@ export default class Info extends BaseEntity{
     @BelongsTo(() => Platform)
     public platform?: Platform;
 
+    @ForeignKey(() => Method)
     @AllowNull
     @Column(INTEGER)
     public methodid: number;
+
+    @BelongsTo(() => Method)
+    public method?: Method;
 
     @AllowNull
     @Column({type: DATE, field: 'start_at'})
@@ -58,7 +63,7 @@ export default class Info extends BaseEntity{
     @Column(STRING)
     public uid: string;
 
-    @BelongsTo(() => User, 'user_info')
+    @BelongsTo(() => User)
     public user?: User;
 
     @AllowNull

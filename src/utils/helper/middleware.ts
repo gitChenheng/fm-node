@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import JSONResult from "@/utils/JSONResult";
-import {getRedisIns} from "@/server/redis";
+import RedisSingleton from "@/server/redis";
 import {JWT_SECRET} from "@/constans/global";
 import whitelist from "@/constans/whitelist";
 
@@ -46,7 +46,7 @@ export const verify = () => {
             await next();
         }else{
             const token = ctx.request.header.token;
-            const redisResult = await getRedisIns().get(token);
+            const redisResult = await RedisSingleton.getRedisInstance().get(token);
             if (redisResult){
                 await next()
             }else{

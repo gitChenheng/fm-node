@@ -1,5 +1,5 @@
 import Info from "@/model/entity/Info";
-import {dbCtx} from "@/server/db/db_context";
+import DbSingleton from "@/server/db/db_context";
 import {Sequelize} from "sequelize-typescript";
 
 export default class InfoDao {
@@ -18,29 +18,19 @@ export default class InfoDao {
     static async queryAllInCondition(item){
         const {reviewStatus, typeid, platformid, pageIndex, pageSize} = item;
         const search = item.search ? `%${item.search}%` : `%%`;
-        const db = dbCtx();
+        const db = DbSingleton.dbCtx();
         return await db.query(
             `SELECT
-            i.id,i.name,i.initiator,i.price,i.review_status AS reviewStatus,i.level,
-            i.typeid,i.platformid,i.start_at AS startAt,i.end_at AS endAt,i.uid,i.credit,
-            i.anonymous,i.free,i.reject_reason AS rejectReason,i.details,i.created_at AS createdAt,
-            p.platform_img_url AS platformImgUrl,p.name AS platform,
+            i.id,i.name,i.initiator,i.price,i.review_status AS reviewStatus,i.level,i.typeid,i.platformid,
+            i.start_at AS startAt,i.end_at AS endAt,i.uid,i.credit,i.anonymous,i.free,i.reject_reason AS rejectReason,
+            i.details,i.created_at AS createdAt,p.platform_img_url AS platformImgUrl,p.name AS platform,
             CASE WHEN pa.created_at IS NULL THEN 0 ELSE 1 END AS participate,
             CASE WHEN i.start_at < now() THEN 1 ELSE 0 END AS ifBegin,
             CASE WHEN i.end_at < now() THEN 1 ELSE 0 END AS ifEnd
-            from info i
-            LEFT JOIN platform p
-            ON i.platformid=p.id
-            LEFT JOIN participate pa
-            ON i.id=pa.infoid
-            WHERE i.review_status=:reviewStatus
-            AND i.typeid${typeid ? `=:typeid` : ` IS NOT NULL`}
-            AND i.platformid${platformid ? `=:platformid` : ` IS NOT NULL`}
-            AND i.name like :search
-            AND i.deleted_at IS NULL
-            ORDER BY i.created_at DESC
-            LIMIT :offset,:pageSize;
-            `,
+            FROM info i LEFT JOIN platform p ON i.platformid=p.id LEFT JOIN participate pa ON i.id=pa.infoid
+            WHERE i.review_status=:reviewStatus AND i.typeid${typeid ? `=:typeid` : ` IS NOT NULL`}
+            AND i.platformid${platformid ? `=:platformid` : ` IS NOT NULL`} AND i.name like :search AND i.deleted_at IS NULL
+            ORDER BY i.created_at DESC LIMIT :offset,:pageSize;`,
             {
                 type: db.QueryTypes.SELECT,
                 plain: false,
@@ -95,23 +85,13 @@ export default class InfoDao {
     }
 
     static async getMyItems(id, pageIndex, pageSize): Promise<Info[any]>{
-        const db = dbCtx();
+        const db = DbSingleton.dbCtx();
         return await db.query(
-            `SELECT
-            i.id,i.name,i.initiator,i.price,i.review_status AS reviewStatus,i.level,
-            i.typeid,i.platformid,i.start_at AS startAt,i.end_at AS endAt,i.uid,i.credit,
-            i.anonymous,i.free,i.reject_reason AS rejectReason,i.details,i.created_at AS createdAt,
-            p.name AS platform,p.platform_img_url AS platformImgUrl,
-            t.name AS type
-            from info i
-            LEFT JOIN platform p
-            ON i.platformid=p.id
-            LEFT JOIN type t
-            ON i.typeid=t.id
-            WHERE uid=:id AND i.deleted_at IS NULL
-            ORDER BY i.created_at DESC
-            LIMIT :offset,:pageSize;
-            `,
+            `SELECT i.id,i.name,i.initiator,i.price,i.review_status AS reviewStatus,i.level,i.typeid,i.platformid,
+            i.start_at AS startAt,i.end_at AS endAt,i.uid,i.credit,i.anonymous,i.free,i.reject_reason AS rejectReason,
+            i.details,i.created_at AS createdAt,p.name AS platform,p.platform_img_url AS platformImgUrl,t.name AS type
+            FROM info i LEFT JOIN platform p ON i.platformid=p.id LEFT JOIN type t ON i.typeid=t.id
+            WHERE uid=:id AND i.deleted_at IS NULL ORDER BY i.created_at DESC LIMIT :offset,:pageSize;`,
             {
                 type: db.QueryTypes.SELECT,
                 plain: false,
