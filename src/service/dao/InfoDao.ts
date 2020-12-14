@@ -16,21 +16,21 @@ export default class InfoDao {
     }
 
     static async queryAllInCondition(item){
-        const {reviewStatus, typeid, platformid, pageIndex, pageSize} = item;
-        const search = item.search ? `%${item.search}%` : `%%`;
+        const {reviewStatus, typeid, platformid, pageIndex, pageSize, search} = item;
+        // const search = item.search ? `%${item.search}%` : `%%`;
         const db = DbSingleton.dbCtx();
         return await db.query(
-            `SELECT
-            i.id,i.name,i.initiator,i.price,i.review_status AS reviewStatus,i.level,i.typeid,i.platformid,
-            i.start_at AS startAt,i.end_at AS endAt,i.uid,i.credit,i.anonymous,i.free,i.reject_reason AS rejectReason,
-            i.details,i.created_at AS createdAt,p.platform_img_url AS platformImgUrl,p.name AS platform,
+            `SELECT i.id,i.name,i.initiator,i.price,i.review_status AS reviewStatus,i.level,
+            i.typeid,i.platformid,i.start_at AS startAt,i.end_at AS endAt,i.uid,i.credit,i.anonymous,
+            i.free,i.reject_reason AS rejectReason,i.details,i.created_at AS createdAt,
+            p.platform_img_url AS platformImgUrl,p.name AS platform,
             CASE WHEN pa.created_at IS NULL THEN 0 ELSE 1 END AS participate,
             CASE WHEN i.start_at < now() THEN 1 ELSE 0 END AS ifBegin,
             CASE WHEN i.end_at < now() THEN 1 ELSE 0 END AS ifEnd
             FROM info i LEFT JOIN platform p ON i.platformid=p.id LEFT JOIN participate pa ON i.id=pa.infoid
             WHERE i.review_status=:reviewStatus AND i.typeid${typeid ? `=:typeid` : ` IS NOT NULL`}
-            AND i.platformid${platformid ? `=:platformid` : ` IS NOT NULL`} AND i.name like :search AND i.deleted_at IS NULL
-            ORDER BY i.created_at DESC LIMIT :offset,:pageSize;`,
+            AND i.platformid${platformid ? `=:platformid` : ` IS NOT NULL`} ${search ? `AND i.name LIKE :search` : ``}
+            AND i.deleted_at IS NULL ORDER BY i.created_at DESC LIMIT :offset,:pageSize;`,
             {
                 type: db.QueryTypes.SELECT,
                 plain: false,
@@ -39,7 +39,7 @@ export default class InfoDao {
                     typeid,
                     platformid,
                     reviewStatus,
-                    search,
+                    search: search ? `%${search}%` : null,
                     offset: (Number(pageIndex) - 1) * Number(pageSize),
                     pageSize
                 }
